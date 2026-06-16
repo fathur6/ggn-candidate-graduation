@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Graduasi Siswazah</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        unisza: { blue: '#2E4DA7', yellow: '#D4AF37' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1e293b; }
+        
+        /* --- REKAAN LOGIN OVERLAY --- */
+        .login-overlay { 
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            position: fixed; inset: 0; z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+        /* --- REKAAN DASHBOARD --- */
+        .dashboard-wrapper {
+            position: relative; min-height: 100vh;
+            background-color: #f9fafb; color: #111827; padding-bottom: 64px;
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+        }
+        .dashboard { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        
+        /* Pelarasan Header */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            gap: 1.5rem;
+            width: 100%;
+        }
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            flex: 1;
+            min-width: 0; 
+        }
+        .header-right { 
+            flex-shrink: 0; 
+        }
+        .header-actions { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center;
+        }
+        
+        .section-title { font-size: 18px; font-weight: 700; color: #1e293b; margin: 24px 0 16px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ""; display: block; width: 4px; height: 18px; background: #0d2b4d; border-radius: 4px; }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 16px; padding: 20px; text-align: center; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px; text-align: left; }
+        .stat-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink:0; }
+        .stat-info { flex: 1; }
+        .stat-number { font-size: 32px; font-weight: 800; color: #1e293b; line-height: 1; margin-top: 4px;}
+        .stat-label { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .table-container { background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 40px; }
+        .table-container table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: center; }
+        .table-container th, .table-container td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; }
+        .table-container th { background: #0d2b4d; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.1); }
+        .table-container th:last-child { border-right: none; }
+        .table-container tr.bg-gray-50 { background-color: #f8fafc; }
+        .table-container tr:hover { background-color: #eff6ff; transition: background-color 0.2s; }
+        .table-footer { background: #9ca3af; color: #111827; font-weight: 800; font-size: 16px; }
+        .table-footer td { padding: 14px 16px; }
+        
+        .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
+        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .chart-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; }
+        .chart-card h3 { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .chart-container { height: 280px; position: relative; }
+
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: #1e293b; color: white; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; font-size: 14px; animation: toastSlideIn 0.3s ease-out forwards; max-width: 350px; }
+        .toast.error { background: #ef4444; }
+        .toast.success { background: #10b981; }
+        .toast.info { background: #3b82f6; }
+        
+        @keyframes toastSlideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes toastFadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        .sync-banner { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 14px 20px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1); }
+        .sync-spinner { width: 22px; height: 22px; border: 3px solid #bfdbfe; border-top: 3px solid #1d4ed8; border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Row Fakulti boleh diklik */
+        .faculty-row { cursor: pointer; transition: background-color 0.2s; }
+        .faculty-row:hover { background-color: #dbeafe !important; }
+
+        /* Modal Pelajar */
+        .student-modal-overlay {
+            background-color: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            position: fixed; inset: 0; z-index: 1050; padding: 20px;
+        }
+        .student-modal-content {
+            background: white; border-radius: 1rem; width: 100%; max-width: 800px; max-height: 90vh;
+            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.3s ease-out;
+        }
+        .student-modal-header {
+            padding: 1.5rem; background: #0d2b4d; color: white; display: flex; justify-content: space-between; align-items: center;
+        }
+        .student-modal-body {
+            padding: 1.5rem; overflow-y: auto; background: #f8fafc; flex: 1;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen m-0">
+
+    <div id="loginOverlay" class="login-overlay hidden">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full border border-slate-100 flex flex-col items-center">
+            <img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" alt="Logo" class="h-16 mb-6 object-contain drop-shadow-sm">
+            
+            <h2 class="text-xl font-bold text-slate-800 mb-2 text-center">Pengesahan Akses</h2>
+            <p class="text-slate-500 text-sm text-center mb-6">Sila masukkan kata laluan untuk memuat turun laporan atau membuka pangkalan data PPS.</p>
+            
+            <div class="w-full mb-4 relative">
+                <i data-feather="lock" class="w-5 h-5 absolute left-3 top-2.5 text-slate-400"></i>
+                <input type="password" id="loginPassword" placeholder="Kata Laluan" class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <p id="loginError" class="text-red-500 text-xs mt-2 hidden font-medium">Kata laluan tidak sah.</p>
+            </div>
+            
+            <div class="flex gap-3 w-full mt-2">
+                <button type="button" id="cancelLoginBtn" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors">Batal</button>
+                <button type="button" id="submitLoginBtn" class="w-1/2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-md">Log Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="studentModal" class="student-modal-overlay hidden">
+        <div class="student-modal-content">
+            <div class="student-modal-header">
+                <div>
+                    <h2 id="modalFacultyTitle" class="text-xl font-bold">Senarai Pelajar</h2>
+                    <p class="text-blue-200 text-sm mt-1">Perincian data mengikut fakulti</p>
+                </div>
+                <button onclick="closeStudentModal()" class="text-white hover:text-red-300 transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="student-modal-body">
+                <div class="table-container !mb-0 shadow-sm border border-gray-200">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-100 text-slate-700">
+                            <tr>
+                                <th class="!bg-slate-200 !text-slate-700 !border-slate-300 w-12 text-center">No</th>
+                                <th class="!bg-slate-200 !text-slate-700 !border-slate-300">Maklumat Pelajar</th>
+                                <th class="!bg-slate-200 !text-slate-700 !border-slate-300 w-1/4">Peringkat</th>
+                                <th class="!bg-slate-200 !text-slate-700 !border-slate-300 w-1/4 text-center">Bulan Lulus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentModalBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboardScreen">
+        <div class="dashboard-wrapper" id="dashboardPrintArea">
+            <div class="dashboard">
+                <div class="header">
+                    <div class="header-left">
+                        <div class="flex items-center gap-6">
+                            <img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" 
+                                 alt="Logo" 
+                                 class="h-16 w-auto object-contain flex-shrink-0">
+                            <div>
+                                <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tight uppercase whitespace-nowrap">
+                                    MODUL GRADUASI SISWAZAH
+                                </h1>
+                                <p class="text-sm text-slate-500 font-normal whitespace-nowrap mt-1">
+                                    Status dan Enrolmen Calon Siswazah
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="header-right">
+                        <div class="header-actions" id="actionButtons">
+                            <button class="btn" style="background:#0ea5e9; color:white;" onclick="fetchDataFromSheet()">
+                                <i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Sync</span>
+                            </button>
+                            <button class="btn" style="background:#059669; color:white;" onclick="handleRestrictedAction('pdf')">
+                                <i class="fas fa-file-pdf"></i> <span>Laporan</span>
+                            </button>
+                            <button class="btn" style="background:#10b981; color:white;" onclick="handleRestrictedAction('sheets')">
+                                <i class="fas fa-table"></i> <span>Sheet</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="syncBanner" class="sync-banner" style="display: none;">
+                    <div class="sync-spinner"></div>
+                    <span>Memproses data mentah dari Google Sheets, sila tunggu sebentar...</span>
+                </div>
+
+                <h2 class="section-title">Ringkasan Keseluruhan</h2>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue-100 text-blue-700"><i class="fas fa-user-graduate"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label">Jumlah Keseluruhan</div>
+                            <div class="stat-number" id="valTotalGrads">-</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-emerald-100 text-emerald-700"><i class="fas fa-bars" style="transform: rotate(-45deg);"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label">Doktor Falsafah</div>
+                            <div class="stat-number" id="valTotalPhd">-</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-purple-100 text-purple-700"><i class="fas fa-grip-lines" style="transform: rotate(-45deg);"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label">Sarjana</div>
+                            <div class="stat-number" id="valTotalMaster">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Visualisasi Data</h2>
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Graduan Mengikut Fakulti</h3>
+                        <div class="chart-container"><canvas id="facultyChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Laporan Suku Tahun Khas (2026)</h3>
+                        <div class="chart-container"><canvas id="quarterlyChart"></canvas></div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Perincian Data Fakulti</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="width: 30%; vertical-align: middle;">
+                                    <i class="fas fa-university mr-2"></i>FAKULTI / INSTITUT<br><span style="font-size:11px; font-weight:400; opacity:0.8">(FACULTY)</span>
+                                </th>
+                                <th colspan="2" style="width: 50%; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                    <i class="fas fa-graduation-cap mr-2"></i>PERINGKAT PENGAJIAN<br><span style="font-size:11px; font-weight:400; opacity:0.8">(DEGREE LEVEL)</span>
+                                </th>
+                                <th rowspan="2" style="width: 20%; vertical-align: middle; border-right: none;">
+                                    JUMLAH<br><span style="font-size:11px; font-weight:400; opacity:0.8">(TOTAL)</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th style="width: 25%; background-color: #0d2b4d; border-top: none;">Doktor Falsafah</th>
+                                <th style="width: 25%; background-color: #0d2b4d; border-top: none;">Sarjana</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="4" style="text-align:center; padding:40px; color:#94a3b8">Sila tunggu sebentar, data sedang disegerakkan...</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-footer">
+                                <td class="border-r border-gray-400">JUMLAH KESELURUHAN</td>
+                                <td class="border-r border-gray-400" id="footerTotalPhd">0</td>
+                                <td class="border-r border-gray-400" id="footerTotalMaster">0</td>
+                                <td id="footerTotalAll">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="p-3 text-center text-xs font-semibold text-gray-500 bg-gray-100 border-t border-gray-200" id="dynamicUpdateMsg">
+                        DATA DIKUMPUL UNTUK TAHUN 2026
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const SHEET_ID = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U'; 
+        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Konvo2026`;
+
+        // State sistem
+        let isAuthorized = false;
+        let pendingAction = null;
+        let facultyChartInstance = null;
+        let quarterlyChartInstance = null;
+        
+        // Cache data mentah untuk fungsi klik fakulti
+        let globalRawDataCache = [];
+
+        // Initialize Feather Icons & Chart
+        feather.replace();
+        Chart.register(ChartDataLabels);
+
+        // --- PLUGIN TERSUAI: LUKIS JUMLAH KESELURUHAN DI ATAS STACKED BAR ---
+        const stackedTotalPlugin = {
+            id: 'stackedTotal',
+            afterDatasetsDraw: (chart) => {
+                if (chart.config.type !== 'bar') return;
+                const ctx = chart.ctx;
+                chart.data.labels.forEach((label, i) => {
+                    let total = 0;
+                    let minTopY = chart.chartArea.bottom; 
+                    let posX = 0;
+                    chart.data.datasets.forEach((dataset, j) => {
+                        const meta = chart.getDatasetMeta(j);
+                        if (!meta.hidden) {
+                            const val = dataset.data[i];
+                            if (val > 0) {
+                                total += val;
+                                const element = meta.data[i];
+                                if (element) {
+                                    posX = element.x;
+                                    if (element.y < minTopY) minTopY = element.y;
+                                }
+                            }
+                        }
+                    });
+                    if (total > 0) {
+                        ctx.save();
+                        ctx.font = 'bold 13px Inter, sans-serif';
+                        ctx.fillStyle = '#1e293b';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        ctx.fillText(total, posX, minTopY - 6);
+                        ctx.restore();
+                    }
+                });
+            }
+        };
+        Chart.register(stackedTotalPlugin);
+
+        // --- LOGIK LOGIN MODAL ---
+        const overlay = document.getElementById('loginOverlay');
+        const passInput = document.getElementById('loginPassword');
+        const errText = document.getElementById('loginError');
+
+        function handleRestrictedAction(actionType) {
+            if (isAuthorized) {
+                executeAction(actionType);
+            } else {
+                pendingAction = actionType;
+                openLoginModal();
+            }
+        }
+
+        function openLoginModal() {
+            overlay.classList.remove('hidden');
+            passInput.value = '';
+            errText.classList.add('hidden');
+            passInput.classList.remove('border-red-500', 'bg-red-50');
+            setTimeout(() => passInput.focus(), 100);
+        }
+
+        function closeLoginModal() {
+            overlay.classList.add('hidden');
+            pendingAction = null;
+        }
+
+        function executeAction(type) {
+            if (type === 'pdf') downloadPDF();
+            if (type === 'sheets') window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
+        }
+
+        function submitLogin() {
+            const pwd = passInput.value;
+            if(pwd === '2gn@PPS2026' || pwd === 'admin') {
+                isAuthorized = true;
+                closeLoginModal();
+                showNotification('Akses disahkan.', 'success');
+                if (pendingAction) {
+                    executeAction(pendingAction);
+                }
+            } else {
+                errText.classList.remove('hidden');
+                passInput.classList.add('border-red-500', 'bg-red-50');
+                passInput.parentElement.classList.add('shake');
+                setTimeout(() => passInput.parentElement.classList.remove('shake'), 400);
+            }
+        }
+
+        document.getElementById('cancelLoginBtn').onclick = closeLoginModal;
+        document.getElementById('submitLoginBtn').onclick = submitLogin;
+        passInput.onkeypress = (e) => { if(e.key === 'Enter') submitLogin(); };
+
+        // --- SISTEM NOTIFIKASI ---
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : type === 'error' ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-info-circle"></i>';
+            toast.innerHTML = `<span style="font-size:18px">${icon}</span> <div>${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'toastFadeOut 0.3s ease-in forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- UTILITI: TARIKH & DATA ---
+        function getQuarter(month) {
+            if ([11, 12, 1].includes(month)) return 'Suku 1 (Q1)';
+            if ([2, 3, 4].includes(month)) return 'Suku 2 (Q2)';
+            if ([5, 6, 7].includes(month)) return 'Suku 3 (Q3)';
+            if ([8, 9, 10].includes(month)) return 'Suku 4 (Q4)';
+            return 'Tidak Diketahui';
+        }
+
+        function extractMonth(dateStr) {
+            if (!dateStr) return 0;
+            const str = String(dateStr).trim().toLowerCase();
+            const monthMap = { 'jan': 1, 'feb': 2, 'mac': 3, 'mar': 3, 'apr': 4, 'mei': 5, 'may': 5, 'jun': 6, 'jul': 7, 'ogo': 8, 'aug': 8, 'sep': 9, 'okt': 10, 'oct': 10, 'nov': 11, 'dis': 12, 'dec': 12 };
+            for (let key in monthMap) if (str.includes(key)) return monthMap[key];
+            const num = parseInt(str);
+            if (!isNaN(num) && num >= 1 && num <= 12 && str.length <= 2) return num;
+            return 0;
+        }
+
+        function extractYear(dateStr) {
+            if (!dateStr) return 0;
+            const match = String(dateStr).match(/\b(20\d{2})\b/);
+            return match ? parseInt(match[1]) : 0;
+        }
+
+        // --- FUNGSI MODAL PELAJAR ---
+        function openStudentModal(facultyName) {
+            const modal = document.getElementById('studentModal');
+            const tbody = document.getElementById('studentModalBody');
+            document.getElementById('modalFacultyTitle').innerText = facultyName;
+            
+            tbody.innerHTML = '';
+            let count = 1;
+            const monthNames = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+
+            // Ekstrak indeks dari barisan pertama rawDataCache
+            let headerRow = globalRawDataCache[0];
+            let cName = 1, cMatrik = 2, cFakulti = 4, cDate = 7, cLevel = 8;
+            
+            for(let j=0; j < headerRow.length; j++) {
+                const h = String(headerRow[j]).toUpperCase().trim();
+                if(h.includes('NAMA') && !h.includes('IJAZAH')) cName = j;
+                if(h.includes('MATRIK')) cMatrik = j;
+                if(h.includes('FAKULTI') || h.includes('FACULTY')) cFakulti = j;
+                if(h === 'DATE' || h === 'TARIKH') cDate = j;
+                if(h === 'LEVEL' || h === 'PERINGKAT' || h.includes('PENGAJIAN')) cLevel = j;
+            }
+
+            // Cari pelajar yang sepadan dengan fakulti
+            globalRawDataCache.forEach((row, i) => {
+                if (i === 0) return; // Langkau tajuk
+                
+                let rowFakulti = String(row[cFakulti] || '').trim().toUpperCase();
+                
+                // Jika fakulti sepadan (exact match atau sebahagian)
+                if (rowFakulti === facultyName || (facultyName !== 'TIADA MAKLUMAT' && rowFakulti.includes(facultyName))) {
+                    let name = row[cName] || 'Tiada Rekod';
+                    let matrik = row[cMatrik] || 'Tiada Matrik';
+                    let dateStr = row[cDate] || '';
+                    let levelRaw = String(row[cLevel] || '').trim();
+                    
+                    let levelClean = "Lain-lain";
+                    if(levelRaw.toLowerCase().includes('doktor') || levelRaw.toLowerCase().includes('phd')) levelClean = '<span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs font-bold">Ph.D</span>';
+                    else if(levelRaw.toLowerCase().includes('sarjana') || levelRaw.toLowerCase().includes('master')) levelClean = '<span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-bold">Sarjana</span>';
+
+                    let monthNum = extractMonth(dateStr);
+                    let yearNum = extractYear(dateStr);
+                    let displayDate = monthNum > 0 ? `${monthNames[monthNum-1]} ${yearNum > 0 ? yearNum : ''}` : '-';
+
+                    tbody.innerHTML += `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50">
+                            <td class="p-3 text-center text-slate-500">${count++}</td>
+                            <td class="p-3">
+                                <div class="font-semibold text-slate-800">${name}</div>
+                                <div class="text-xs text-slate-500">${matrik}</div>
+                            </td>
+                            <td class="p-3 text-left">${levelClean}</td>
+                            <td class="p-3 text-center font-medium text-slate-600">${displayDate}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if(count === 1) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-500">Tiada pelajar dijumpai untuk fakulti ini.</td></tr>`;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('studentModal').classList.add('hidden');
+        }
+
+        // --- PENGEMASKINIAN UI (DOM) ---
+        function updateDOM(totalStats, facultyDataArr, quarterlyDataArr, latestMonth, latestYear) {
+            document.getElementById('valTotalGrads').innerText = totalStats.total || '-';
+            document.getElementById('valTotalPhd').innerText = totalStats.phd || '-';
+            document.getElementById('valTotalMaster').innerText = totalStats.master || '-';
+            document.getElementById('footerTotalPhd').innerText = totalStats.phd || '0';
+            document.getElementById('footerTotalMaster').innerText = totalStats.master || '0';
+            document.getElementById('footerTotalAll').innerText = totalStats.total || '0';
+
+            let updateMsg = "DATA DIKUMPUL UNTUK TAHUN 2026";
+            if (latestYear > 0 && latestMonth > 0) {
+                const monthNames = ["JAN", "FEB", "MAC", "APR", "MEI", "JUN", "JUL", "OGO", "SEP", "OKT", "NOV", "DIS"];
+                updateMsg = `DATA DIKEMASKINI SEHINGGA ${monthNames[latestMonth - 1]} ${latestYear} (DIKIRA DARI JADUAL ANALISIS PPS)`;
+            }
+            document.getElementById('dynamicUpdateMsg').innerText = updateMsg;
+
+            const tableBody = document.getElementById('tableBody');
+            let tableHTML = '';
+            if (facultyDataArr.length === 0) {
+                tableHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:#94a3b8">Tiada data untuk dipaparkan.</td></tr>`;
+            } else {
+                facultyDataArr.forEach((item, index) => {
+                    const itemTotal = item.phd + item.master;
+                    const bgClass = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                    tableHTML += `
+                        <tr class="${bgClass} faculty-row" onclick="openStudentModal('${item.id.replace(/'/g, "\\'")}')" title="Klik untuk lihat senarai pelajar">
+                            <td class="font-medium text-blue-700 border-r border-gray-200 hover:underline cursor-pointer"><i class="fas fa-search-plus text-xs text-blue-400 mr-1"></i> ${item.id}</td>
+                            <td class="text-gray-600 border-r border-gray-200">${item.phd}</td>
+                            <td class="text-gray-600 border-r border-gray-200">${item.master}</td>
+                            <td class="font-bold text-gray-800">${itemTotal}</td>
+                        </tr>
+                    `;
+                });
+            }
+            tableBody.innerHTML = tableHTML;
+            renderCharts(facultyDataArr, quarterlyDataArr);
+        }
+
+        function renderCharts(facultyDataArr, quarterlyDataArr) {
+            if(facultyChartInstance) facultyChartInstance.destroy();
+            if(quarterlyChartInstance) quarterlyChartInstance.destroy();
+            if (facultyDataArr.length === 0) return;
+
+            const ctxFaculty = document.getElementById('facultyChart').getContext('2d');
+            facultyChartInstance = new Chart(ctxFaculty, {
+                type: 'bar',
+                data: {
+                    labels: facultyDataArr.map(d => d.id),
+                    datasets: [
+                        { label: 'Doktor Falsafah', data: facultyDataArr.map(d => d.phd), backgroundColor: '#10b981', borderRadius: 4 },
+                        { label: 'Sarjana', data: facultyDataArr.map(d => d.master), backgroundColor: '#a855f7', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    layout: { padding: { top: 25 } },
+                    scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true } },
+                    plugins: { 
+                        legend: { position: 'bottom' },
+                        datalabels: { color: '#ffffff', font: { weight: 'bold', size: 11 }, formatter: (v) => v > 0 ? v : '', anchor: 'center', align: 'center' }
+                    }
+                }
+            });
+
+            const ctxQuarterly = document.getElementById('quarterlyChart').getContext('2d');
+            quarterlyChartInstance = new Chart(ctxQuarterly, {
+                type: 'line',
+                data: {
+                    labels: quarterlyDataArr.map(d => d.quarter),
+                    datasets: [
+                        { label: 'Doktor Falsafah', data: quarterlyDataArr.map(d => d.phd), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, pointRadius: 5, fill: true, tension: 0.3 },
+                        { label: 'Sarjana', data: quarterlyDataArr.map(d => d.master), borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', borderWidth: 3, pointRadius: 5, fill: true, tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, suggestedMax: 20 }, x: { grid: { display: false } } },
+                    plugins: { legend: { position: 'bottom' }, datalabels: { display: false } }
+                }
+            });
+        }
+
+        // --- PROSES DATA ---
+        function processSheetData(rawData) {
+            globalRawDataCache = rawData; // Simpan data untuk Modal
+            
+            let total = 0, totalPhd = 0, totalMaster = 0;
+            let facultyStats = []; 
+            let quarterStats = { 'Suku 1 (Q1)': { phd: 0, master: 0 }, 'Suku 2 (Q2)': { phd: 0, master: 0 }, 'Suku 3 (Q3)': { phd: 0, master: 0 }, 'Suku 4 (Q4)': { phd: 0, master: 0 } };
+            let latestYear = 0, latestMonth = 0;
+
+            // BACA JADUAL ANALISIS MANUAL (L10:O25)
+            for (let i = 9; i <= 24; i++) {
+                if (rawData[i]) {
+                    const fak = rawData[i][11] ? String(rawData[i][11]).trim() : '';
+                    if (fak && fak.toUpperCase() !== 'FAKULTI' && !fak.toUpperCase().includes('JUMLAH')) {
+                        let colPhd = 12, colMaster = 13;
+                        if (rawData[8] && rawData[8][12]) {
+                            if (String(rawData[8][12]).toUpperCase().includes('SARJANA')) { colPhd = 13; colMaster = 12; }
+                        }
+                        const p = parseInt(rawData[i][colPhd]) || 0;
+                        const m = parseInt(rawData[i][colMaster]) || 0;
+                        if (p > 0 || m > 0 || fak.length > 1) {
+                            facultyStats.push({ id: fak.toUpperCase(), phd: p, master: m });
+                            totalPhd += p; totalMaster += m;
+                        }
+                    }
+                    if (fak && (fak.toUpperCase() === 'JUMLAH' || fak.toUpperCase().includes('JUMLAH KESELURUHAN'))) break;
+                }
+            }
+            total = totalPhd + totalMaster;
+
+            // BACA DATA MENTAH UNTUK GRAF SUKU TAHUN & TARIKH TERKINI
+            let colDate = 7, colLevel = 8, colIjazah = 3;
+            if (rawData[0]) {
+                for (let j = 0; j < rawData[0].length; j++) {
+                    const h = String(rawData[0][j]).toUpperCase().trim();
+                    if (h === 'DATE' || h === 'TARIKH') colDate = j;
+                    if (h === 'LEVEL' || h === 'PERINGKAT' || h.includes('PENGAJIAN')) colLevel = j;
+                    if (h === 'NAMA IJAZAH' || h === 'IJAZAH') colIjazah = j;
+                }
+            }
+
+            for (let i = 1; i < rawData.length; i++) {
+                const row = rawData[i];
+                if (!row || !row[colDate]) continue;
+                const m = extractMonth(row[colDate]);
+                const y = extractYear(row[colDate]);
+                if (m > 0) {
+                    if (y > latestYear || (y === latestYear && m > latestMonth)) { latestYear = y; latestMonth = m; }
+                    const p = String(row[colLevel] || '').toLowerCase();
+                    const ij = String(row[colIjazah] || '').toLowerCase();
+                    let isPhd = p.includes('doktor') || p.includes('phd') || ij.includes('doktor') || ij.includes('phd');
+                    const q = getQuarter(m);
+                    if (quarterStats[q]) { if (isPhd) quarterStats[q].phd++; else quarterStats[q].master++; }
+                }
+            }
+
+            const facultyDataArr = facultyStats.sort((a, b) => (b.phd + b.master) - (a.phd + a.master));
+            const quarterlyDataArr = [
+                { quarter: 'Suku 1 (Nov-Jan)', phd: quarterStats['Suku 1 (Q1)'].phd, master: quarterStats['Suku 1 (Q1)'].master },
+                { quarter: 'Suku 2 (Feb-Apr)', phd: quarterStats['Suku 2 (Q2)'].phd, master: quarterStats['Suku 2 (Q2)'].master },
+                { quarter: 'Suku 3 (Mei-Jul)', phd: quarterStats['Suku 3 (Q3)'].phd, master: quarterStats['Suku 3 (Q3)'].master },
+                { quarter: 'Suku 4 (Ogo-Okt)', phd: quarterStats['Suku 4 (Q4)'].phd, master: quarterStats['Suku 4 (Q4)'].master }
+            ];
+            updateDOM({ total, phd: totalPhd, master: totalMaster }, facultyDataArr, quarterlyDataArr, latestMonth, latestYear);
+        }
+
+        // --- FUNGSI MUAT TURUN PDF ---
+        function downloadPDF() {
+            showNotification('Menjana laporan PDF...', 'info');
+            const element = document.querySelector('.dashboard');
+            const actions = document.querySelector('.header-actions');
+            const originalDisplay = actions.style.display;
+            actions.style.display = 'none';
+            
+            const opt = { 
+                margin: 0.5, 
+                filename: 'Laporan_Data_Graduasi_PPS.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true }, 
+                jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } 
+            };
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                actions.style.display = originalDisplay;
+                showNotification('Laporan berjaya dimuat turun.', 'success');
+            });
+        }
+
+        // --- FETCH AUTO-SYNC ---
+        function fetchDataFromSheet() {
+            const banner = document.getElementById('syncBanner');
+            if (banner) banner.style.display = 'flex';
+            const cacheBusterUrl = SHEET_CSV_URL + '&tq=select%20*&_cb=' + new Date().getTime();
+            Papa.parse(cacheBusterUrl, {
+                download: true,
+                header: false,
+                skipEmptyLines: false,
+                complete: function(results) {
+                    if (banner) banner.style.display = 'none';
+                    if(results.data && results.data.length > 0) {
+                        processSheetData(results.data);
+                        showNotification('Data berjaya disegerakkan.', 'success');
+                    }
+                },
+                error: function() {
+                    if (banner) banner.style.display = 'none';
+                    showNotification('Gagal mencapai Google Sheets.', 'error');
+                }
+            });
+        }
+
+        // Panggil fungsi sync serta-merta apabila halaman dibuka
+        window.onload = fetchDataFromSheet;
+    </script>
+</body>
+</html>
