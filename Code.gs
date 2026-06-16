@@ -20,13 +20,9 @@ const ADMIN_EMAILS = [
   "shahirahmansor@unisza.edu.my",
   "nasarudinsalleh@unisza.edu.my",
   "nadhirahrashid@unisza.edu.my",
-  "pps_tdakademik@unisza.edu.my" // Pastikan email anda ada di sini untuk testing lokal
+  "pps_tdakademik@unisza.edu.my"
 ];
 
-/**
- * Melancarkan fail index.html sebagai Web App.
- * XFrameOptionsMode.ALLOWALL membenarkan ia dipaparkan di dalam Google Sites.
- */
 function doGet(e) {
   return HtmlService.createHtmlOutputFromFile('index')
       .setTitle('Modul Graduasi Siswazah')
@@ -34,10 +30,6 @@ function doGet(e) {
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
-/**
- * Membaca data Google Sheets secara selamat menggunakan Google OAuth pengguna semasa.
- * Fungsi ini juga menyemak status peranan (Role) pengguna secara automatik.
- */
 function getPostgraduateData() {
   const userEmail = Session.getActiveUser().getEmail();
   const isAdmin = ADMIN_EMAILS.includes(userEmail);
@@ -58,18 +50,7 @@ function getPostgraduateData() {
       success: false,
       email: userEmail,
       isAdmin: isAdmin,
-      message: "Akses Pangkalan Data Gagal. Sila pastikan akaun Google UniSZA anda mempunyai kebenaran akses ke fail Google Sheet tersebut. Ralat: " + error.toString()
+      message: "Ralat Pangkalan Data: Sila pastikan akaun anda mempunyai akses ke Sheets tersebut. " + error.toString()
     };
   }
-}
-
-/**
- * Fungsi sekunder untuk pengesahan akses pentadbir secara pantas.
- */
-function checkAdminAccess() {
-  const userEmail = Session.getActiveUser().getEmail();
-  return {
-    authorized: ADMIN_EMAILS.includes(userEmail),
-    email: userEmail
-  };
 }
