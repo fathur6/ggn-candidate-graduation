@@ -128,9 +128,17 @@
     <div id="toast" class="toast"></div>
 
     <script>
+        window.onerror = function(msg, url, line, col, err) {
+            document.getElementById('dynamicUpdateMsg').innerText = 'RALAT JS: ' + msg + ' (baris ' + line + ')';
+            document.getElementById('syncBanner').classList.add('hidden');
+            document.getElementById('dynamicUpdateMsg').style.color = '#ef4444';
+            console.error(msg, url, line, col, err);
+        };
+
+        try {
         let userEmail = "", isUserAdmin = false, globalRawDataCache = [], currentSpreadsheetId = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
         let facultyChartInstance = null, quarterlyChartInstance = null, fetchTimeout = null;
-        Chart.register(ChartDataLabels);
+        try { Chart.register(ChartDataLabels); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
 
         function showNotification(msg, type='info') {
             const t = document.getElementById('toast');
@@ -332,6 +340,11 @@
         }
 
         window.onload = fetchDataFromSheet;
+
+        } catch(e) {
+            document.getElementById('dynamicUpdateMsg').innerText = 'RALAT INISIALISASI: ' + e.message;
+            document.getElementById('dynamicUpdateMsg').style.color = '#ef4444';
+        }
     </script>
 </body>
 </html>
