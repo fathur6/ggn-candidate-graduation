@@ -30,20 +30,23 @@ function doGet(e) {
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
-function getPostgraduateData() {
+function getPostgraduateData(customSpreadsheetId, customSheetName) {
   const userEmail = Session.getActiveUser().getEmail();
   const isAdmin = ADMIN_EMAILS.includes(userEmail);
   
   try {
-    const spreadsheetId = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
-    const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Konvo2026');
+    const spreadsheetId = customSpreadsheetId || '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
+    const sheetName = customSheetName || 'Konvo2026';
+    const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName);
     const rawData = sheet.getDataRange().getValues();
     
     return {
       success: true,
       email: userEmail,
       isAdmin: isAdmin,
-      data: rawData
+      data: rawData,
+      spreadsheetId: spreadsheetId,
+      sheetName: sheetName
     };
   } catch (error) {
     return {
