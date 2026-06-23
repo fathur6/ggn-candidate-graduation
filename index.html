@@ -25,7 +25,7 @@
         <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
             <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
                 <h2 id="modalTitle" class="font-bold uppercase tracking-tight">Senarai Pelajar</h2>
-                <button onclick="closeStudentModal()"><i class="fas fa-times text-xl"></i></button>
+                <button id="closeStudentModalBtn"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="overflow-y-auto p-4 bg-slate-50">
                 <table class="w-full text-sm">
@@ -42,7 +42,7 @@
         <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl">
             <div class="bg-slate-800 p-4 text-white rounded-t-2xl flex justify-between items-center">
                 <h2 class="font-bold uppercase tracking-tight"><i class="fas fa-database mr-2"></i>Tukar Pangkalan Data</h2>
-                <button onclick="closeSpreadsheetIdModal()"><i class="fas fa-times text-xl"></i></button>
+                <button id="closeSpreadsheetIdModalHeaderBtn"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="p-6">
                 <p class="text-slate-600 text-sm mb-4">Akaun anda tiada akses ke spreadsheet semasa. Sila masukkan ID spreadsheet Google Sheets yang anda mempunyai akses:</p>
@@ -55,8 +55,8 @@
                     <input id="newSheetNameInput" type="text" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Default: Konvo2026" value="Konvo2026">
                 </div>
                 <div class="flex gap-3 justify-end">
-                    <button onclick="closeSpreadsheetIdModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 font-bold hover:bg-slate-50 transition-all">Batal</button>
-                    <button onclick="retryWithNewSheetId()" class="px-4 py-2 bg-sky-500 text-white rounded-lg font-bold hover:bg-sky-600 transition-all"><i class="fas fa-save mr-2"></i>Simpan & Sync</button>
+                    <button id="cancelSpreadsheetIdModalBtn" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 font-bold hover:bg-slate-50 transition-all">Batal</button>
+                    <button id="saveSpreadsheetIdModalBtn" class="px-4 py-2 bg-sky-500 text-white rounded-lg font-bold hover:bg-sky-600 transition-all"><i class="fas fa-save mr-2"></i>Simpan & Sync</button>
                 </div>
             </div>
         </div>
@@ -73,9 +73,9 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="fetchDataFromSheet()" class="bg-sky-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all"><i class="fas fa-sync-alt mr-2"></i>Sync</button>
-                    <button onclick="handleRestrictedAction('pdf')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-emerald-700 transition-all"><i class="fas fa-file-pdf mr-2"></i>Laporan</button>
-                    <button onclick="handleRestrictedAction('sheets')" class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-green-600 transition-all"><i class="fas fa-table mr-2"></i>Sheet</button>
+                    <button id="syncDataBtn" class="bg-sky-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all"><i class="fas fa-sync-alt mr-2"></i>Sync</button>
+                    <button id="generatePdfBtn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-emerald-700 transition-all"><i class="fas fa-file-pdf mr-2"></i>Laporan</button>
+                    <button id="openSheetBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-green-600 transition-all"><i class="fas fa-table mr-2"></i>Sheet</button>
                 </div>
             </div>
 
@@ -255,7 +255,7 @@
 
             let html = '';
             Object.keys(facMap).sort((a,b) => (facMap[b].p+facMap[b].m) - (facMap[a].p+facMap[a].m)).forEach(f => {
-                html += `<tr class="faculty-row border-b" onclick="openStudentModal('${f}')">
+                html += `<tr class="faculty-row border-b">
                     <td class="p-3 text-left font-bold text-blue-800 border-r"><i class="fas fa-search-plus mr-2 opacity-30"></i>${f}</td>
                     <td class="border-r">${facMap[f].p}</td><td class="border-r">${facMap[f].m}</td>
                     <td class="font-black">${facMap[f].p + facMap[f].m}</td></tr>`;
