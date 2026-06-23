@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modul Graduasi Siswazah</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Removed CDN links -->
     <style>
         body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
         .dashboard-wrapper { background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); min-height: 100vh; padding: 24px; }
@@ -127,223 +121,247 @@
     </div>
     <div id="toast" class="toast"></div>
 
-    <script>
+        <script>
+        // Global error handler for runtime errors
         window.onerror = function(msg, url, line, col, err) {
-            document.getElementById('dynamicUpdateMsg').innerText = 'RALAT JS: ' + msg + ' (baris ' + line + ')';
+            document.getElementById('dynamicUpdateMsg').innerText = 'RALAT JS (Runtime): ' + msg + ' (baris ' + line + ')';
             document.getElementById('syncBanner').classList.add('hidden');
             document.getElementById('dynamicUpdateMsg').style.color = '#ef4444';
-            console.error(msg, url, line, col, err);
+            console.error('RALAT JS (Runtime):', msg, url, line, col, err);
+            return true; // Prevent default error handling
         };
 
         try {
-        let userEmail = "", isUserAdmin = false, globalRawDataCache = [], currentSpreadsheetId = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
-        let facultyChartInstance = null, quarterlyChartInstance = null, fetchTimeout = null;
-        try { Chart.register(ChartDataLabels); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
+            console.log('Skrip mula dimuatkan. (Version: Cleaned & Event Listeners)');
 
-        function showNotification(msg, type='info') {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block'; t.style.background = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#1e293b');
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
+            let userEmail = "", isUserAdmin = false, globalRawDataCache = [], currentSpreadsheetId = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
+            let facultyChartInstance = null, quarterlyChartInstance = null, fetchTimeout = null;
 
-        function handleRestrictedAction(type) {
-            if (isUserAdmin) {
-                if (type === 'pdf') downloadPDF();
-                if (type === 'sheets') window.open(`https://docs.google.com/spreadsheets/d/${currentSpreadsheetId}/edit`, '_blank');
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Akses Ditolak',
-                    text: `Akaun (${userEmail || 'Tidak Diketahui'}) tiada akses Pentadbir.`,
-                    showCancelButton: true,
-                    confirmButtonText: 'Tukar ID Pangkalan Data',
-                    cancelButtonText: 'Tutup',
-                    confirmButtonColor: '#2E4DA7',
-                    cancelButtonColor: '#64748b'
-                }).then((result) => {
-                    if (result.isConfirmed) openSpreadsheetIdModal();
-                });
+            // Chart.js and plugins are removed for now.
+            // try { Chart.register(ChartDataLabels); console.log('ChartDataLabels didaftar.'); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
+
+            function showNotification(msg, type='info') {
+                const t = document.getElementById('toast');
+                t.innerText = msg; t.style.display = 'block'; t.style.background = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#1e293b');
+                setTimeout(() => t.style.display = 'none', 3000);
             }
-        }
 
-        function openStudentModal(fak) {
-            const tbody = document.getElementById('studentModalBody');
-            document.getElementById('modalTitle').innerText = fak;
-            tbody.innerHTML = ''; let count = 1;
-            
-            globalRawDataCache.forEach((row, i) => {
-                if (i === 0) return;
-                if (String(row[4] || '').trim().toUpperCase() === fak) {
-                    const level = String(row[8] || '').toLowerCase().includes('doktor') ? 'Ph.D' : 'Sarjana';
-                    tbody.innerHTML += `<tr class="border-b bg-white hover:bg-blue-50"><td class="p-2 text-center">${count++}</td><td class="p-2"><b>${row[1]}</b><br><small>${row[2]}</small></td><td class="p-2 text-center">${level}</td><td class="p-2 text-center text-xs">${row[7]}</td></tr>`;
+            function handleRestrictedAction(type) {
+                console.log('handleRestrictedAction dipanggil. Type:', type);
+                if (isUserAdmin) {
+                    if (type === 'pdf') { /* downloadPDF(); */ showNotification('PDF generation is disabled in this diagnostic version.', 'info'); }
+                    if (type === 'sheets') window.open(`https://docs.google.com/spreadsheets/d/${currentSpreadheetId}/edit`, '_blank');
+                } else {
+                    // SweetAlert2 is removed for now, use showNotification
+                    showNotification(`Akses Ditolak: Akaun (${userEmail || 'Tidak Diketahui'}) tiada akses Pentadbir.`, 'error');
+                    // Swal.fire({ ... }).then(...) part is commented out
+                    // We directly open the spreadsheet modal for testing purposes if restricted
+                    openSpreadsheetIdModal();
                 }
-            });
-            document.getElementById('studentModal').classList.remove('hidden');
-        }
-        function closeStudentModal() { document.getElementById('studentModal').classList.add('hidden'); }
+            }
 
-        function openSpreadsheetIdModal() {
-            document.getElementById('syncBanner').classList.add('hidden');
-            if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
-            document.getElementById('newSpreadsheetIdInput').value = '';
-            document.getElementById('spreadsheetIdModal').classList.remove('hidden');
-        }
-        function closeSpreadsheetIdModal() { document.getElementById('spreadsheetIdModal').classList.add('hidden'); }
-        function retryWithNewSheetId() {
-            let raw = document.getElementById('newSpreadsheetIdInput').value.trim();
-            if (!raw) { showNotification('Sila masukkan Spreadsheet ID atau URL', 'error'); return; }
-            const idMatch = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-            const newId = idMatch ? idMatch[1] : raw;
-            const sheetName = document.getElementById('newSheetNameInput').value.trim() || 'Konvo2026';
-            closeSpreadsheetIdModal();
-            document.getElementById('syncBanner').classList.remove('hidden');
-            if (fetchTimeout) clearTimeout(fetchTimeout);
-            fetchTimeout = setTimeout(() => {
-                document.getElementById('syncBanner').classList.add('hidden');
-                openSpreadsheetIdModal();
-                showNotification('Masa tamat. Sila cuba ID lain.', 'error');
-            }, 30000);
-            google.script.run
-                .withSuccessHandler(res => {
-                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
-                    document.getElementById('syncBanner').classList.add('hidden');
-                    if (res && res.success) {
-                        userEmail = res.email; isUserAdmin = res.isAdmin;
-                        if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
-                        processData(res.data);
-                        showNotification(`Berjaya. Log: ${userEmail}`, 'success');
-                    } else {
-                        const msg = res && res.message ? res.message : '';
-                        showNotification(msg || 'Ralat tidak diketahui', 'error');
-                        openSpreadsheetIdModal();
+            function openStudentModal(fak) {
+                console.log('openStudentModal dipanggil. Fakulti:', fak);
+                const tbody = document.getElementById('studentModalBody');
+                document.getElementById('modalTitle').innerText = fak;
+                tbody.innerHTML = ''; let count = 1;
+
+                globalRawDataCache.forEach((row, i) => {
+                    if (i === 0) return;
+                    if (String(row[4] || '').trim().toUpperCase() === fak) {
+                        const level = String(row[8] || '').toLowerCase().includes('doktor') ? 'Ph.D' : 'Sarjana';
+                        tbody.innerHTML += `<tr class="border-b bg-white hover:bg-blue-50"><td class="p-2 text-center">${count++}</td><td class="p-2"><b>${row[1]}</b><br><small>${row[2]}</small></td><td class="p-2 text-center">${level}</td><td class="p-2 text-center text-xs">${row[7]}</td></tr>`;
                     }
-                })
-                .withFailureHandler(err => {
-                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                });
+                document.getElementById('studentModal').classList.remove('hidden');
+            }
+            function closeStudentModal() { document.getElementById('studentModal').classList.add('hidden'); console.log('closeStudentModal dipanggil.'); }
+
+            function openSpreadsheetIdModal() {
+                console.log('openSpreadsheetIdModal dipanggil.');
+                document.getElementById('syncBanner').classList.add('hidden');
+                if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                document.getElementById('newSpreadsheetIdInput').value = '';
+                document.getElementById('spreadsheetIdModal').classList.remove('hidden');
+            }
+            function closeSpreadsheetIdModal() { document.getElementById('spreadsheetIdModal').classList.add('hidden'); console.log('closeSpreadsheetIdModal dipanggil.'); }
+
+            function retryWithNewSheetId() {
+                console.log('retryWithNewSheetId dipanggil.');
+                let raw = document.getElementById('newSpreadsheetIdInput').value.trim();
+                if (!raw) { showNotification('Sila masukkan Spreadsheet ID atau URL', 'error'); return; }
+                const idMatch = raw.match(/\/d\/([a-zA-Z0-9_-]+)/); // Corrected regex
+                const newId = idMatch ? idMatch[1] : raw;
+                const sheetName = document.getElementById('newSheetNameInput').value.trim() || 'Konvo2026';
+                closeSpreadsheetIdModal();
+                document.getElementById('syncBanner').classList.remove('hidden');
+                if (fetchTimeout) clearTimeout(fetchTimeout);
+                fetchTimeout = setTimeout(() => {
+                    console.log('retryWithNewSheetId: Timeout dicetuskan.');
                     document.getElementById('syncBanner').classList.add('hidden');
                     openSpreadsheetIdModal();
-                    showNotification('Ralat Server Google. Sila cuba ID lain.', 'error');
-                })
-                .getPostgraduateData(newId, sheetName);
-        }
-
-        function processData(rawData) {
-            globalRawDataCache = rawData;
-            let totalPhd = 0, totalMaster = 0, facMap = {};
-            let qStats = {'Suku 1': {p:0, m:0}, 'Suku 2': {p:0, m:0}, 'Suku 3': {p:0, m:0}, 'Suku 4': {p:0, m:0}};
-
-            for (let i = 1; i < rawData.length; i++) {
-                const row = rawData[i]; if (!row[1] && !row[4]) continue;
-                const f = String(row[4] || 'TIADA MAKLUMAT').trim().toUpperCase();
-                const isPhd = String(row[8] || '').toLowerCase().includes('doktor');
-                
-                if (!facMap[f]) facMap[f] = {p:0, m:0};
-                if (isPhd) { facMap[f].p++; totalPhd++; } else { facMap[f].m++; totalMaster++; }
-
-                const m = extractMonth(row[7]);
-                const q = m <= 1 || m >= 11 ? 'Suku 1' : (m <= 4 ? 'Suku 2' : (m <= 7 ? 'Suku 3' : 'Suku 4'));
-                if (isPhd) qStats[q].p++; else qStats[q].m++;
+                    showNotification('Masa tamat. Sila cuba ID lain.', 'error');
+                }, 30000);
+                console.log(`Memanggil google.script.run.getPostgraduateData('${newId}', '${sheetName}')...`);
+                google.script.run
+                    .withSuccessHandler(res => {
+                        console.log('google.script.run.getPostgraduateData() SuccessHandler dipanggil (retry).', res);
+                        if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                        document.getElementById('syncBanner').classList.add('hidden');
+                        if (res && res.success) {
+                            userEmail = res.email; isUserAdmin = res.isAdmin;
+                            if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
+                            processData(res.data);
+                            showNotification(`Berjaya. Log: ${userEmail}`, 'success');
+                        } else {
+                            const msg = res && res.message ? res.message : '';
+                            console.log('Menunjukkan notifikasi ralat lain (retry).');
+                            showNotification(msg || 'Ralat tidak diketahui', 'error');
+                            openSpreadsheetIdModal();
+                        }
+                    })
+                    .withFailureHandler(err => {
+                        console.error('google.script.run.getPostgraduateData() FailureHandler dipanggil (retry).', err);
+                        if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                        document.getElementById('syncBanner').classList.add('hidden');
+                        openSpreadsheetIdModal();
+                        showNotification('Ralat Server Google. Sila cuba ID lain.', 'error');
+                    })
+                    .getPostgraduateData(newId, sheetName);
             }
 
-            const sortedFac = Object.values(facMap).sort((a,b) => (b.p+b.m) - (a.p+a.m));
-            document.getElementById('valTotalGrads').innerText = totalPhd + totalMaster;
-            document.getElementById('valTotalPhd').innerText = totalPhd;
-            document.getElementById('valTotalMaster').innerText = totalMaster;
-            document.getElementById('footerTotalPhd').innerText = totalPhd;
-            document.getElementById('footerTotalMaster').innerText = totalMaster;
-            document.getElementById('footerTotalAll').innerText = totalPhd + totalMaster;
+            function processData(rawData) {
+                console.log('processData dipanggil. Data:', rawData);
+                globalRawDataCache = rawData;
+                let totalPhd = 0, totalMaster = 0, facMap = {};
+                let qStats = {'Suku 1': {p:0, m:0}, 'Suku 2': {p:0, m:0}, 'Suku 3': {p:0, m:0}, 'Suku 4': {p:0, m:0}};
 
-            let html = '';
-            Object.keys(facMap).sort((a,b) => (facMap[b].p+facMap[b].m) - (facMap[a].p+facMap[a].m)).forEach(f => {
-                html += `<tr class="faculty-row border-b">
-                    <td class="p-3 text-left font-bold text-blue-800 border-r"><i class="fas fa-search-plus mr-2 opacity-30"></i>${f}</td>
-                    <td class="border-r">${facMap[f].p}</td><td class="border-r">${facMap[f].m}</td>
-                    <td class="font-black">${facMap[f].p + facMap[f].m}</td></tr>`;
-            });
-            document.getElementById('tableBody').innerHTML = html;
-            document.getElementById('dynamicUpdateMsg').innerText = "DATA DIKEMASKINI SECARA AUTOMATIK DARI PANGKALAN DATA";
-            renderCharts(Object.keys(facMap), facMap, qStats);
-        }
+                for (let i = 1; i < rawData.length; i++) {
+                    const row = rawData[i]; if (!row[1] && !row[4]) continue;
+                    const f = String(row[4] || 'TIADA MAKLUMAT').trim().toUpperCase();
+                    const isPhd = String(row[8] || '').toLowerCase().includes('doktor') ? 'Ph.D' : 'Sarjana';
 
-        function extractMonth(s) {
-            const m = String(s).toLowerCase();
-            if (m.includes('jan')) return 1; if (m.includes('feb')) return 2; if (m.includes('mac')) return 3; if (m.includes('apr')) return 4;
-            if (m.includes('mei')) return 5; if (m.includes('jun')) return 6; if (m.includes('jul')) return 7; if (m.includes('ogo')) return 8;
-            if (m.includes('sep')) return 9; if (m.includes('okt')) return 10; if (m.includes('nov')) return 11; if (m.includes('dis')) return 12;
-            return 0;
-        }
+                    if (!facMap[f]) facMap[f] = {p:0, m:0};
+                    if (isPhd) { facMap[f].p++; totalPhd++; } else { facMap[f].m++; totalMaster++; }
 
-        function renderCharts(labels, facMap, qStats) {
-            const fCtx = document.getElementById('facultyChart').getContext('2d');
-            if (facultyChartInstance) facultyChartInstance.destroy();
-            facultyChartInstance = new Chart(fCtx, {
-                type: 'bar',
-                data: { labels: labels, datasets: [
-                    { label: 'Ph.D', data: labels.map(l => facMap[l].p), backgroundColor: '#10b981' },
-                    { label: 'Sarjana', data: labels.map(l => facMap[l].m), backgroundColor: '#a855f7' }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { datalabels: { color: '#fff', font: { weight: 'bold' }}}}
-            });
+                    const m = extractMonth(row[7]);
+                    const q = m <= 1 || m >= 11 ? 'Suku 1' : (m <= 4 ? 'Suku 2' : (m <= 7 ? 'Suku 3' : 'Suku 4'));
+                    if (isPhd) qStats[q].p++; else qStats[q].m++;
+                }
 
-            const qCtx = document.getElementById('quarterlyChart').getContext('2d');
-            if (quarterlyChartInstance) quarterlyChartInstance.destroy();
-            quarterlyChartInstance = new Chart(qCtx, {
-                type: 'line',
-                data: { labels: Object.keys(qStats), datasets: [
-                    { label: 'Ph.D', data: Object.values(qStats).map(s => s.p), borderColor: '#10b981', tension: 0.3, fill: true, backgroundColor: 'rgba(16,185,129,0.1)' },
-                    { label: 'Sarjana', data: Object.values(qStats).map(s => s.m), borderColor: '#a855f7', tension: 0.3, fill: true, backgroundColor: 'rgba(168,85,247,0.1)' }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
+                document.getElementById('valTotalGrads').innerText = totalPhd + totalMaster;
+                document.getElementById('valTotalPhd').innerText = totalPhd;
+                document.getElementById('valTotalMaster').innerText = totalMaster;
+                document.getElementById('footerTotalPhd').innerText = totalPhd;
+                document.getElementById('footerTotalMaster').innerText = totalMaster;
+                document.getElementById('footerTotalAll').innerText = totalPhd + totalMaster;
 
-        function fetchDataFromSheet() {
-            document.getElementById('syncBanner').classList.remove('hidden');
-            if (fetchTimeout) clearTimeout(fetchTimeout);
-            fetchTimeout = setTimeout(() => {
-                document.getElementById('syncBanner').classList.add('hidden');
-                openSpreadsheetIdModal();
-                showNotification('Masa tamat. Sila semak sambungan atau tukar ID spreadsheet.', 'error');
-            }, 30000);
-            google.script.run
-                .withSuccessHandler(res => {
-                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                let html = '';
+                Object.keys(facMap).sort((a,b) => (facMap[b].p+facMap[b].m) - (facMap[a].p+facMap[a].m)).forEach(f => {
+                    html += `<tr class="faculty-row border-b">
+                        <td class="p-3 text-left font-bold text-blue-800 border-r"><i class="fas fa-search-plus mr-2 opacity-30"></i>${f}</td>
+                        <td class="border-r">${facMap[f].p}</td><td class="border-r">${facMap[f].m}</td>
+                        <td class="font-black">${facMap[f].p + facMap[f].m}</td></tr>`;
+                });
+                document.getElementById('tableBody').innerHTML = html;
+                document.getElementById('dynamicUpdateMsg').innerText = "DATA DIKEMASKINI SECARA AUTOMATIK DARI PANGKALAN DATA";
+                // renderCharts(Object.keys(facMap), facMap, qStats); // Chart rendering disabled
+                console.log('processData selesai.');
+            }
+
+            function extractMonth(s) {
+                const m = String(s).toLowerCase();
+                if (m.includes('jan')) return 1; if (m.includes('feb')) return 2; if (m.includes('mac')) return 3; if (m.includes('apr')) return 4;
+                if (m.includes('mei')) return 5; if (m.includes('jun')) return 6; if (m.includes('jul')) return 7; if (m.includes('ogo')) return 8;
+                if (m.includes('sep')) return 9; if (m.includes('okt')) return 10; if (m.includes('nov')) return 11; if (m.includes('dis')) return 12;
+                return 0;
+            }
+
+            // function renderCharts(labels, facMap, qStats) { // Chart rendering disabled
+            //     console.log('renderCharts dipanggil (disabled).');
+            //     // Chart rendering code is commented out for now.
+            // }
+
+            function fetchDataFromSheet() {
+                console.log('fetchDataFromSheet dipanggil.');
+                document.getElementById('syncBanner').classList.remove('hidden');
+                if (fetchTimeout) clearTimeout(fetchTimeout);
+                fetchTimeout = setTimeout(() => {
+                    console.log('fetchDataFromSheet: Timeout dicetuskan.');
                     document.getElementById('syncBanner').classList.add('hidden');
-                    if (res && res.success) {
-                        userEmail = res.email; isUserAdmin = res.isAdmin;
-                        if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
-                        processData(res.data);
-                        showNotification(`Berjaya. Log: ${userEmail}`, 'success');
-                    } else {
-                        const msg = res && res.message ? res.message : '';
-                        if (msg.includes('Ralat Pangkalan Data') || msg.includes('openById') || msg.includes('spreadsheets') || msg.includes('permission')) {
-                            openSpreadsheetIdModal();
+                    openSpreadsheetIdModal();
+                    showNotification('Masa tamat. Sila semak sambungan atau tukar ID spreadsheet.', 'error');
+                }, 30000);
+                console.log('Memanggil google.script.run.getPostgraduateData()...');
+                google.script.run
+                    .withSuccessHandler(res => {
+                        console.log('google.script.run.getPostgraduateData() SuccessHandler dipanggil.', res);
+                        if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                        document.getElementById('syncBanner').classList.add('hidden');
+                        if (res && res.success) {
+                            userEmail = res.email; isUserAdmin = res.isAdmin;
+                            if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
+                            processData(res.data);
+                            showNotification(`Berjaya. Log: ${userEmail}`, 'success');
                         } else {
-                            showNotification(msg || 'Ralat tidak diketahui', 'error');
+                            const msg = res && res.message ? res.message : '';
+                            if (msg.includes('Ralat Pangkalan Data') || msg.includes('openById') || msg.includes('spreadsheets') || msg.includes('permission')) {
+                                console.log('Membuka modal spreadsheet ID kerana ralat kebenaran.');
+                                openSpreadsheetIdModal();
+                            } else {
+                                console.log('Menunjukkan notifikasi ralat lain.');
+                                showNotification(msg || 'Ralat tidak diketahui', 'error');
+                            }
+                        }
+                    })
+                    .withFailureHandler(err => {
+                        console.error('google.script.run.getPostgraduateData() FailureHandler dipanggil.', err);
+                        if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                        document.getElementById('syncBanner').classList.add('hidden');
+                        openSpreadsheetIdModal();
+                        showNotification('Ralat Server Google. Tukar ID spreadsheet jika perlu.', 'error');
+                    })
+                    .getPostgraduateData();
+            }
+
+            // PDF generation is disabled for now
+            function downloadPDF() {
+                console.log('downloadPDF dipanggil (disabled).');
+                showNotification('PDF generation is disabled in this diagnostic version.', 'info');
+                // original html2pdf code is commented out.
+            }
+
+            // Event Listeners for static buttons
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOMContentLoaded dicetuskan.');
+
+                document.getElementById('closeStudentModalBtn').addEventListener('click', closeStudentModal);
+                document.getElementById('closeSpreadsheetIdModalHeaderBtn').addEventListener('click', closeSpreadsheetIdModal);
+                document.getElementById('cancelSpreadsheetIdModalBtn').addEventListener('click', closeSpreadsheetIdModal);
+                document.getElementById('saveSpreadsheetIdModalBtn').addEventListener('click', retryWithNewSheetId);
+                document.getElementById('syncDataBtn').addEventListener('click', fetchDataFromSheet);
+                document.getElementById('generatePdfBtn').addEventListener('click', () => handleRestrictedAction('pdf'));
+                document.getElementById('openSheetBtn').addEventListener('click', () => handleRestrictedAction('sheets'));
+
+                // Event Delegation for dynamically created faculty rows
+                document.getElementById('tableBody').addEventListener('click', function(event) {
+                    const targetRow = event.target.closest('.faculty-row');
+                    if (targetRow) {
+                        const fakElement = targetRow.querySelector('td');
+                        if (fakElement) {
+                            const fak = fakElement.innerText.replace(/\\n/g, ' ').trim(); // Extract faculty name
+                            openStudentModal(fak);
                         }
                     }
-                })
-                .withFailureHandler(err => {
-                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
-                    document.getElementById('syncBanner').classList.add('hidden');
-                    openSpreadsheetIdModal();
-                    showNotification('Ralat Server Google. Tukar ID spreadsheet jika perlu.', 'error');
-                })
-                .getPostgraduateData();
-        }
-
-        function downloadPDF() {
-            showNotification('Menjana PDF...', 'info');
-            const actions = document.getElementById('actionButtons'); actions.style.display = 'none';
-            html2pdf().set({ margin: 0.5, filename: 'Laporan_Graduasi.pdf', html2canvas: { scale: 2 }, jsPDF: { format: 'a3', orientation: 'landscape' } })
-                .from(document.querySelector('.max-w-6xl')).save().then(() => actions.style.display = 'flex');
-        }
-
-        window.onload = fetchDataFromSheet;
+                });
+                
+                fetchDataFromSheet(); // Initial fetch on load
+            });
 
         } catch(e) {
             document.getElementById('dynamicUpdateMsg').innerText = 'RALAT INISIALISASI: ' + e.message;
             document.getElementById('dynamicUpdateMsg').style.color = '#ef4444';
+            console.error('RALAT INISIALISASI:', e);
         }
     </script>
 </body>
