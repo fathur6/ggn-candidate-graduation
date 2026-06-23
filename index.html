@@ -129,7 +129,7 @@
 
     <script>
         let userEmail = "", isUserAdmin = false, globalRawDataCache = [], currentSpreadsheetId = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
-        let facultyChartInstance = null, quarterlyChartInstance = null;
+        let facultyChartInstance = null, quarterlyChartInstance = null, fetchTimeout = null;
         Chart.register(ChartDataLabels);
 
         function showNotification(msg, type='info') {
@@ -175,6 +175,8 @@
         function closeStudentModal() { document.getElementById('studentModal').classList.add('hidden'); }
 
         function openSpreadsheetIdModal() {
+            document.getElementById('syncBanner').classList.add('hidden');
+            if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
             document.getElementById('newSpreadsheetIdInput').value = '';
             document.getElementById('spreadsheetIdModal').classList.remove('hidden');
         }
@@ -187,17 +189,33 @@
             const sheetName = document.getElementById('newSheetNameInput').value.trim() || 'Konvo2026';
             closeSpreadsheetIdModal();
             document.getElementById('syncBanner').classList.remove('hidden');
+            if (fetchTimeout) clearTimeout(fetchTimeout);
+            fetchTimeout = setTimeout(() => {
+                document.getElementById('syncBanner').classList.add('hidden');
+                openSpreadsheetIdModal();
+                showNotification('Masa tamat. Sila cuba ID lain.', 'error');
+            }, 30000);
             google.script.run
                 .withSuccessHandler(res => {
+                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
                     document.getElementById('syncBanner').classList.add('hidden');
-                    if (res.success) {
+                    if (res && res.success) {
                         userEmail = res.email; isUserAdmin = res.isAdmin;
                         if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
                         processData(res.data);
                         showNotification(`Berjaya. Log: ${userEmail}`, 'success');
-                    } else { showNotification(res.message, 'error'); openSpreadsheetIdModal(); }
+                    } else {
+                        const msg = res && res.message ? res.message : '';
+                        showNotification(msg || 'Ralat tidak diketahui', 'error');
+                        openSpreadsheetIdModal();
+                    }
                 })
-                .withFailureHandler(() => { document.getElementById('syncBanner').classList.add('hidden'); showNotification('Ralat Server Google', 'error'); })
+                .withFailureHandler(err => {
+                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                    document.getElementById('syncBanner').classList.add('hidden');
+                    openSpreadsheetIdModal();
+                    showNotification('Ralat Server Google. Sila cuba ID lain.', 'error');
+                })
                 .getPostgraduateData(newId, sheetName);
         }
 
@@ -273,23 +291,36 @@
 
         function fetchDataFromSheet() {
             document.getElementById('syncBanner').classList.remove('hidden');
+            if (fetchTimeout) clearTimeout(fetchTimeout);
+            fetchTimeout = setTimeout(() => {
+                document.getElementById('syncBanner').classList.add('hidden');
+                openSpreadsheetIdModal();
+                showNotification('Masa tamat. Sila semak sambungan atau tukar ID spreadsheet.', 'error');
+            }, 30000);
             google.script.run
                 .withSuccessHandler(res => {
+                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
                     document.getElementById('syncBanner').classList.add('hidden');
-                    if (res.success) {
+                    if (res && res.success) {
                         userEmail = res.email; isUserAdmin = res.isAdmin;
                         if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
                         processData(res.data);
                         showNotification(`Berjaya. Log: ${userEmail}`, 'success');
                     } else {
-                        if (res.message && (res.message.includes('openById') || res.message.includes('spreadsheets') || res.message.includes('permission'))) {
+                        const msg = res && res.message ? res.message : '';
+                        if (msg.includes('Ralat Pangkalan Data') || msg.includes('openById') || msg.includes('spreadsheets') || msg.includes('permission')) {
                             openSpreadsheetIdModal();
                         } else {
-                            showNotification(res.message, 'error');
+                            showNotification(msg || 'Ralat tidak diketahui', 'error');
                         }
                     }
                 })
-                .withFailureHandler(() => { document.getElementById('syncBanner').classList.add('hidden'); showNotification('Ralat Server Google', 'error'); })
+                .withFailureHandler(err => {
+                    if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
+                    document.getElementById('syncBanner').classList.add('hidden');
+                    openSpreadsheetIdModal();
+                    showNotification('Ralat Server Google. Tukar ID spreadsheet jika perlu.', 'error');
+                })
                 .getPostgraduateData();
         }
 
