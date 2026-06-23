@@ -136,9 +136,10 @@
         };
 
         try {
+        console.log('Skrip mula dimuatkan.');
         let userEmail = "", isUserAdmin = false, globalRawDataCache = [], currentSpreadsheetId = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
         let facultyChartInstance = null, quarterlyChartInstance = null, fetchTimeout = null;
-        try { Chart.register(ChartDataLabels); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
+        try { Chart.register(ChartDataLabels); console.log('ChartDataLabels didaftar.'); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
 
         function showNotification(msg, type='info') {
             const t = document.getElementById('toast');
@@ -190,6 +191,7 @@
         }
         function closeSpreadsheetIdModal() { document.getElementById('spreadsheetIdModal').classList.add('hidden'); }
         function retryWithNewSheetId() {
+            console.log('retryWithNewSheetId dipanggil.');
             let raw = document.getElementById('newSpreadsheetIdInput').value.trim();
             if (!raw) { showNotification('Sila masukkan Spreadsheet ID atau URL', 'error'); return; }
             const idMatch = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -199,12 +201,15 @@
             document.getElementById('syncBanner').classList.remove('hidden');
             if (fetchTimeout) clearTimeout(fetchTimeout);
             fetchTimeout = setTimeout(() => {
+                console.log('retryWithNewSheetId: Timeout dicetuskan.');
                 document.getElementById('syncBanner').classList.add('hidden');
                 openSpreadsheetIdModal();
                 showNotification('Masa tamat. Sila cuba ID lain.', 'error');
             }, 30000);
+            console.log(`Memanggil google.script.run.getPostgraduateData('${newId}', '${sheetName}')...`);
             google.script.run
                 .withSuccessHandler(res => {
+                    console.log('google.script.run.getPostgraduateData() SuccessHandler dipanggil (retry).', res);
                     if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
                     document.getElementById('syncBanner').classList.add('hidden');
                     if (res && res.success) {
@@ -214,11 +219,13 @@
                         showNotification(`Berjaya. Log: ${userEmail}`, 'success');
                     } else {
                         const msg = res && res.message ? res.message : '';
+                        console.log('Menunjukkan notifikasi ralat lain (retry).');
                         showNotification(msg || 'Ralat tidak diketahui', 'error');
                         openSpreadsheetIdModal();
                     }
                 })
                 .withFailureHandler(err => {
+                    console.error('google.script.run.getPostgraduateData() FailureHandler dipanggil (retry).', err);
                     if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
                     document.getElementById('syncBanner').classList.add('hidden');
                     openSpreadsheetIdModal();
@@ -298,15 +305,19 @@
         }
 
         function fetchDataFromSheet() {
+            console.log('fetchDataFromSheet dipanggil.');
             document.getElementById('syncBanner').classList.remove('hidden');
             if (fetchTimeout) clearTimeout(fetchTimeout);
             fetchTimeout = setTimeout(() => {
+                console.log('fetchDataFromSheet: Timeout dicetuskan.');
                 document.getElementById('syncBanner').classList.add('hidden');
                 openSpreadsheetIdModal();
                 showNotification('Masa tamat. Sila semak sambungan atau tukar ID spreadsheet.', 'error');
             }, 30000);
+            console.log('Memanggil google.script.run.getPostgraduateData()...');
             google.script.run
                 .withSuccessHandler(res => {
+                    console.log('google.script.run.getPostgraduateData() SuccessHandler dipanggil.', res);
                     if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
                     document.getElementById('syncBanner').classList.add('hidden');
                     if (res && res.success) {
@@ -317,13 +328,16 @@
                     } else {
                         const msg = res && res.message ? res.message : '';
                         if (msg.includes('Ralat Pangkalan Data') || msg.includes('openById') || msg.includes('spreadsheets') || msg.includes('permission')) {
+                            console.log('Membuka modal spreadsheet ID kerana ralat kebenaran.');
                             openSpreadsheetIdModal();
                         } else {
+                            console.log('Menunjukkan notifikasi ralat lain.');
                             showNotification(msg || 'Ralat tidak diketahui', 'error');
                         }
                     }
                 })
                 .withFailureHandler(err => {
+                    console.error('google.script.run.getPostgraduateData() FailureHandler dipanggil.', err);
                     if (fetchTimeout) { clearTimeout(fetchTimeout); fetchTimeout = null; }
                     document.getElementById('syncBanner').classList.add('hidden');
                     openSpreadsheetIdModal();
@@ -339,7 +353,7 @@
                 .from(document.querySelector('.max-w-6xl')).save().then(() => actions.style.display = 'flex');
         }
 
-        window.onload = fetchDataFromSheet;
+        document.addEventListener('DOMContentLoaded', fetchDataFromSheet);
 
         } catch(e) {
             document.getElementById('dynamicUpdateMsg').innerText = 'RALAT INISIALISASI: ' + e.message;
