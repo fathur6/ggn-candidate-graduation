@@ -7,32 +7,6 @@ function getAdminEmails() {
   return prop ? prop.split(',').map(e => e.trim().toLowerCase()) : [];
 }
 
-function setAdminEmailsForSetup() {
-  const emails = [
-    "mutiasobihah@unisza.edu.my",
-    "whishamudin@unisza.edu.my",
-    "fathurrahman@unisza.edu.my",
-    "fairuznasir@unisza.edu.my",
-    "yusnitayusof@unisza.edu.my",
-    "fatinhannani@unisza.edu.my",
-    "ariffahimi@unisza.edu.my",
-    "azuhazana@unisza.edu.my",
-    "shuhadaaziz@unisza.edu.my",
-    "afiqahnorozi@unisza.edu.my",
-    "muhammadhamizan@unisza.edu.my",
-    "normala@unisza.edu.my",
-    "wannorakmal@unisza.edu.my",
-    "zailawati@unisza.edu.my",
-    "roshazilahruslee@unisza.edu.my",
-    "shahirahmansor@unisza.edu.my",
-    "nasarudinsalleh@unisza.edu.my",
-    "nadhirahrashid@unisza.edu.my",
-    "pps_tdakademik@unisza.edu.my"
-  ];
-  PropertiesService.getScriptProperties().setProperty('ADMIN_EMAILS', emails.join(','));
-  return 'ADMIN_EMAILS disimpan. Jumlah: ' + emails.length;
-}
-
 function getAdminsWeb() {
   return getAdminEmails();
 }
