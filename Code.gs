@@ -33,6 +33,33 @@ function setAdminEmailsForSetup() {
   return 'ADMIN_EMAILS disimpan. Jumlah: ' + emails.length;
 }
 
+function getAdminsWeb() {
+  return getAdminEmails();
+}
+
+function addAdminWeb(newEmail) {
+  const userEmail = Session.getActiveUser().getEmail();
+  const admins = getAdminEmails();
+  if (!admins.includes(userEmail.toLowerCase())) throw new Error('Hanya pentadbir boleh menambah admin.');
+  const clean = newEmail.trim().toLowerCase();
+  if (!clean || !clean.includes('@')) throw new Error('Emel tidak sah.');
+  if (admins.includes(clean)) throw new Error('Emel sudah wujud dalam senarai.');
+  admins.push(clean);
+  PropertiesService.getScriptProperties().setProperty('ADMIN_EMAILS', admins.join(','));
+  return admins;
+}
+
+function removeAdminWeb(email) {
+  const userEmail = Session.getActiveUser().getEmail();
+  const admins = getAdminEmails();
+  if (!admins.includes(userEmail.toLowerCase())) throw new Error('Hanya pentadbir boleh membuang admin.');
+  const clean = email.trim().toLowerCase();
+  const filtered = admins.filter(e => e !== clean);
+  if (filtered.length === admins.length) throw new Error('Emel tidak dijumpai dalam senarai.');
+  PropertiesService.getScriptProperties().setProperty('ADMIN_EMAILS', filtered.join(','));
+  return filtered;
+}
+
 function doGet(e) {
   return HtmlService.createHtmlOutputFromFile('index')
       .setTitle('Modul Graduasi Siswazah')

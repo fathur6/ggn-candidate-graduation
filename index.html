@@ -38,6 +38,26 @@
         </div>
     </div>
 
+    <div id="adminModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[1100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl">
+            <div class="bg-slate-800 p-4 text-white rounded-t-2xl flex justify-between items-center">
+                <h2 class="font-bold uppercase tracking-tight"><i class="fas fa-users-gear mr-2"></i>Urus Pentadbir Sistem</h2>
+                <button id="closeAdminModalBtn"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 bg-slate-50 border-b border-slate-200">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Tambah Emel Pentadbir Baharu</label>
+                <div class="flex gap-2">
+                    <input type="email" id="newAdminEmail" class="flex-1 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Contoh: admin@unisza.edu.my">
+                    <button id="addAdminBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 transition-all whitespace-nowrap"><i class="fas fa-plus mr-1"></i>Tambah</button>
+                </div>
+            </div>
+            <div class="max-h-[50vh] overflow-y-auto" id="adminListArea"></div>
+            <div class="border-t border-slate-200 p-4 flex justify-end bg-slate-50 rounded-b-2xl">
+                <button id="closeAdminModalFooterBtn" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 font-bold hover:bg-slate-100 transition-all">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <div class="dashboard-wrapper">
         <div class="max-w-6xl mx-auto">
             <div class="flex justify-between items-center mb-8 gap-4 flex-wrap">
@@ -52,6 +72,7 @@
                     <button id="syncDataBtn" class="bg-sky-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all"><i class="fas fa-sync-alt mr-2"></i>Sync</button>
                     <button id="generatePdfBtn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-emerald-700 transition-all"><i class="fas fa-file-pdf mr-2"></i>Laporan</button>
                     <button id="openSheetBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-green-600 transition-all"><i class="fas fa-table mr-2"></i>Sheet</button>
+                    <button id="manageAdminBtn" class="bg-amber-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-amber-600 transition-all"><i class="fas fa-users-gear mr-2"></i>Urus Admin</button>
                 </div>
             </div>
 
@@ -129,6 +150,100 @@
                     confirmButtonColor: '#2E4DA7'
                 });
             }
+        }
+
+        let adminList = [];
+
+        function openAdminModal() {
+            if (!isUserAdmin) {
+                Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Hanya pentadbir boleh mengurus senarai admin.', confirmButtonColor: '#2E4DA7' });
+                return;
+            }
+            document.getElementById('adminModal').classList.remove('hidden');
+            document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 text-xl"></i><p class="text-sm mt-2">Memuat turun senarai admin...</p></div>';
+            google.script.run
+                .withSuccessHandler(function(list) {
+                    adminList = list;
+                    renderAdminListHtml();
+                })
+                .withFailureHandler(function(err) {
+                    document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Gagal memuat senarai: ' + (err.message || err) + '</div>';
+                })
+                .getAdminsWeb();
+        }
+
+        function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+
+        function renderAdminListHtml() {
+            const area = document.getElementById('adminListArea');
+            if (!adminList.length) {
+                area.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Tiada pentadbir.</div>';
+                return;
+            }
+            let html = '';
+            adminList.forEach(function(email) {
+                html += '<div class="flex items-center justify-between px-6 py-3 border-b border-slate-100 hover:bg-slate-50">' +
+                    '<span class="font-semibold text-slate-700 text-sm">' + escapeHtml(email) + '</span>' +
+                    '<button class="text-red-500 hover:text-red-700 text-xs font-bold" data-email="' + escapeHtml(email) + '"><i class="fas fa-trash mr-1"></i>Buang</button>' +
+                    '</div>';
+            });
+            area.innerHTML = html;
+            area.querySelectorAll('button[data-email]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    removeAdminAction(this.getAttribute('data-email'));
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        function addAdminAction() {
+            var newEmail = document.getElementById('newAdminEmail').value.trim();
+            if (!newEmail) return;
+            document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 text-xl"></i><p class="text-sm mt-2">Menambah admin...</p></div>';
+            google.script.run
+                .withSuccessHandler(function(list) {
+                    adminList = list;
+                    document.getElementById('newAdminEmail').value = '';
+                    renderAdminListHtml();
+                    showNotification('Pentadbir baharu berjaya ditambah.', 'success');
+                })
+                .withFailureHandler(function(err) {
+                    showNotification(err.message || 'Gagal menambah admin.', 'error');
+                    renderAdminListHtml();
+                })
+                .addAdminWeb(newEmail);
+        }
+
+        function removeAdminAction(email) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Buang Pentadbir?',
+                text: 'Adakah anda pasti mahu membuang ' + email + ' dari senarai pentadbir?',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Buang',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b'
+            }).then(function(result) {
+                if (!result.isConfirmed) return;
+                document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-red-500 text-xl"></i><p class="text-sm mt-2">Membuang admin...</p></div>';
+                google.script.run
+                    .withSuccessHandler(function(list) {
+                        adminList = list;
+                        renderAdminListHtml();
+                        showNotification('Pentadbir berjaya dibuang.', 'success');
+                    })
+                    .withFailureHandler(function(err) {
+                        showNotification(err.message || 'Gagal membuang admin.', 'error');
+                        renderAdminListHtml();
+                    })
+                    .removeAdminWeb(email);
+            });
         }
 
         function openStudentModal(fak) {
@@ -254,6 +369,11 @@
             document.getElementById('syncDataBtn').addEventListener('click', fetchDataFromSheet);
             document.getElementById('generatePdfBtn').addEventListener('click', () => handleRestrictedAction('pdf'));
             document.getElementById('openSheetBtn').addEventListener('click', () => handleRestrictedAction('sheets'));
+            document.getElementById('manageAdminBtn').addEventListener('click', openAdminModal);
+
+            document.getElementById('closeAdminModalBtn').addEventListener('click', closeAdminModal);
+            document.getElementById('closeAdminModalFooterBtn').addEventListener('click', closeAdminModal);
+            document.getElementById('addAdminBtn').addEventListener('click', addAdminAction);
 
             document.getElementById('tableBody').addEventListener('click', function(event) {
                 const targetRow = event.target.closest('.faculty-row');
