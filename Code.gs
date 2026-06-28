@@ -1,27 +1,37 @@
 // ==========================================
-// SENARAI EMAIL ADMIN YANG DIBENARKAN (PPS)
+// SENARAI EMAIL ADMIN DISIMPAN DI SCRIPT PROPERTIES
+// Key: ADMIN_EMAILS | Value: email1,email2,... (dipisah koma)
 // ==========================================
-const ADMIN_EMAILS = [
-  "mutiasobihah@unisza.edu.my", 
-  "whishamudin@unisza.edu.my",
-  "fathurrahman@unisza.edu.my",
-  "fairuznasir@unisza.edu.my",
-  "yusnitayusof@unisza.edu.my",
-  "fatinhannani@unisza.edu.my",
-  "ariffahimi@unisza.edu.my",
-  "azuhazana@unisza.edu.my",
-  "shuhadaaziz@unisza.edu.my",
-  "afiqahnorozi@unisza.edu.my",
-  "muhammadhamizan@unisza.edu.my",
-  "normala@unisza.edu.my",
-  "wannorakmal@unisza.edu.my", 
-  "zailawati@unisza.edu.my",
-  "roshazilahruslee@unisza.edu.my",
-  "shahirahmansor@unisza.edu.my",
-  "nasarudinsalleh@unisza.edu.my",
-  "nadhirahrashid@unisza.edu.my",
-  "pps_tdakademik@unisza.edu.my"
-];
+function getAdminEmails() {
+  const prop = PropertiesService.getScriptProperties().getProperty('ADMIN_EMAILS');
+  return prop ? prop.split(',').map(e => e.trim().toLowerCase()) : [];
+}
+
+function setAdminEmailsForSetup() {
+  const emails = [
+    "mutiasobihah@unisza.edu.my",
+    "whishamudin@unisza.edu.my",
+    "fathurrahman@unisza.edu.my",
+    "fairuznasir@unisza.edu.my",
+    "yusnitayusof@unisza.edu.my",
+    "fatinhannani@unisza.edu.my",
+    "ariffahimi@unisza.edu.my",
+    "azuhazana@unisza.edu.my",
+    "shuhadaaziz@unisza.edu.my",
+    "afiqahnorozi@unisza.edu.my",
+    "muhammadhamizan@unisza.edu.my",
+    "normala@unisza.edu.my",
+    "wannorakmal@unisza.edu.my",
+    "zailawati@unisza.edu.my",
+    "roshazilahruslee@unisza.edu.my",
+    "shahirahmansor@unisza.edu.my",
+    "nasarudinsalleh@unisza.edu.my",
+    "nadhirahrashid@unisza.edu.my",
+    "pps_tdakademik@unisza.edu.my"
+  ];
+  PropertiesService.getScriptProperties().setProperty('ADMIN_EMAILS', emails.join(','));
+  return 'ADMIN_EMAILS disimpan. Jumlah: ' + emails.length;
+}
 
 function doGet(e) {
   return HtmlService.createHtmlOutputFromFile('index')
@@ -32,7 +42,8 @@ function doGet(e) {
 
 function getPostgraduateData() {
   const userEmail = Session.getActiveUser().getEmail();
-  const isAdmin = ADMIN_EMAILS.includes(userEmail);
+  const adminEmails = getAdminEmails();
+  const isAdmin = adminEmails.includes(userEmail.toLowerCase());
   
   try {
     const spreadsheetId = '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
