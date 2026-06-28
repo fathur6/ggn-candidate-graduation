@@ -4,7 +4,7 @@
 // SHEET_NAME     = Nama sheet data graduan
 // ==========================================
 function getSpreadsheetId() {
-  return PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || '';
+  return PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || '1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U';
 }
 
 function getSheetName() {
