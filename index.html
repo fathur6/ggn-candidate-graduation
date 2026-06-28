@@ -7,8 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -47,13 +45,13 @@
             <div class="p-6 bg-slate-50 border-b border-slate-200">
                 <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Tambah Emel Pentadbir Baharu</label>
                 <div class="flex gap-2">
-                    <input type="email" id="newAdminEmail" class="flex-1 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Contoh: admin@unisza.edu.my">
-                    <button id="addAdminBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 transition-all whitespace-nowrap"><i class="fas fa-plus mr-1"></i>Tambah</button>
+                    <input type="email" id="newAdminEmail" class="flex-1 border border-slate-300 rounded-lg p-2.5 text-sm outline-none" placeholder="Contoh: admin@unisza.edu.my">
+                    <button id="addAdminBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Tambah</button>
                 </div>
             </div>
-            <div class="max-h-[50vh] overflow-y-auto" id="adminListArea"></div>
-            <div class="border-t border-slate-200 p-4 flex justify-end bg-slate-50 rounded-b-2xl">
-                <button id="closeAdminModalFooterBtn" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 font-bold hover:bg-slate-100 transition-all">Tutup</button>
+            <div class="max-h-[40vh] overflow-y-auto" id="adminListArea"></div>
+            <div class="p-4 flex justify-end bg-slate-50 rounded-b-2xl border-t">
+                <button id="closeAdminModalFooterBtn" class="px-4 py-2 border rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100">Tutup</button>
             </div>
         </div>
     </div>
@@ -64,21 +62,16 @@
                 <div class="flex items-center gap-4">
                     <img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" class="h-16">
                     <div>
-                        <h1 class="text-3xl font-black text-slate-800 uppercase leading-none">Modul Graduasi Siswazah</h1>
+                        <h1 class="text-3xl font-black text-slate-800 uppercase">Modul Graduasi Siswazah</h1>
                         <p class="text-slate-500 text-sm mt-1">Status dan Enrolmen Calon Siswazah</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button id="syncDataBtn" class="bg-sky-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all"><i class="fas fa-sync-alt mr-2"></i>Sync</button>
-                    <button id="generatePdfBtn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-emerald-700 transition-all"><i class="fas fa-file-pdf mr-2"></i>Laporan</button>
-                    <button id="openSheetBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-green-600 transition-all"><i class="fas fa-table mr-2"></i>Sheet</button>
-                    <button id="manageAdminBtn" class="bg-amber-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-amber-600 transition-all"><i class="fas fa-users-gear mr-2"></i>Urus Admin</button>
+                    <button id="syncDataBtn" class="bg-sky-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-sky-600 shadow-sm transition-all"><i class="fas fa-sync-alt mr-2"></i>Sync</button>
+                    <button id="generatePdfBtn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 shadow-sm transition-all"><i class="fas fa-file-pdf mr-2"></i>Laporan</button>
+                    <button id="openSheetBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 shadow-sm transition-all"><i class="fas fa-table mr-2"></i>Sheet</button>
+                    <button id="manageAdminBtn" class="bg-amber-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-amber-600 shadow-sm transition-all"><i class="fas fa-users-gear mr-2"></i>Urus Admin</button>
                 </div>
-            </div>
-
-            <div id="syncBanner" class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6 flex items-center gap-3 hidden">
-                <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <span class="text-blue-700 font-medium text-sm">Sila tunggu, sedang menyegerakkan data dari pangkalan data...</span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -88,11 +81,11 @@
                 </div>
                 <div class="stat-card">
                     <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl"><i class="fas fa-award"></i></div>
-                    <div><p class="text-xs font-bold text-slate-500 uppercase">Doktor Falsafah</p><h2 id="valTotalPhd" class="text-3xl font-black text-slate-800">-</h2></div>
+                    <div><p class="text-xs font-bold text-slate-500 uppercase">Doktor Falsafah (Ph.D)</p><h2 id="valTotalPhd" class="text-3xl font-black text-slate-800">-</h2></div>
                 </div>
                 <div class="stat-card">
                     <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl"><i class="fas fa-graduation-cap"></i></div>
-                    <div><p class="text-xs font-bold text-slate-500 uppercase">Sarjana</p><h2 id="valTotalMaster" class="text-3xl font-black text-slate-800">-</h2></div>
+                    <div><p class="text-xs font-bold text-slate-500 uppercase">Sarjana (Master)</p><h2 id="valTotalMaster" class="text-3xl font-black text-slate-800">-</h2></div>
                 </div>
             </div>
 
@@ -102,12 +95,12 @@
                     <div class="h-64"><canvas id="facultyChart"></canvas></div>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Laporan Suku Tahun 2026</h3>
+                    <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Laporan Suku Tahun</h3>
                     <div class="h-64"><canvas id="quarterlyChart"></canvas></div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <table class="w-full text-sm text-center">
                     <thead class="bg-slate-800 text-white">
                         <tr><th rowspan="2" class="p-4 border-r border-slate-700">FAKULTI / INSTITUT</th><th colspan="2" class="p-2 border-b border-slate-700">PERINGKAT PENGAJIAN</th><th rowspan="2" class="p-4">JUMLAH</th></tr>
@@ -118,204 +111,130 @@
                         <tr><td class="p-4 border-r">JUMLAH KESELURUHAN</td><td id="footerTotalPhd" class="border-r">0</td><td id="footerTotalMaster" class="border-r">0</td><td id="footerTotalAll">0</td></tr>
                     </tfoot>
                 </table>
-                <div id="dynamicUpdateMsg" class="p-3 bg-slate-50 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">Memuatkan data...</div>
+                <div id="dynamicUpdateMsg" class="p-3 bg-yellow-50 text-center text-xs font-bold text-yellow-700 border-t border-yellow-200">Memulakan Sistem...</div>
             </div>
         </div>
     </div>
     <div id="toast" class="toast"></div>
 
     <script>
-        console.log('Skrip mula dimuatkan.');
+        var userRole = 'guest';
+        var userEmail = 'Menunggu...';
+        var globalRawDataCache = [];
+        var currentSpreadsheetId = '';
+        var facultyChartInstance = null;
+        var quarterlyChartInstance = null;
+        var adminList = [];
 
-        let userEmail = "", userRole = 'guest', globalRawDataCache = [], currentSpreadsheetId = '';
-        let facultyChartInstance = null, quarterlyChartInstance = null, adminList = [];
+        try { Chart.register(ChartDataLabels); } catch(e) {}
 
-        try { Chart.register(ChartDataLabels); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
+        function updateStatus(msg, type) {
+            var el = document.getElementById('dynamicUpdateMsg');
+            el.innerText = msg;
+            if (type === 'error') {
+                el.className = "p-3 bg-red-50 text-center text-xs font-bold text-red-600 border-t border-red-200";
+            } else if (type === 'success') {
+                el.className = "p-3 bg-green-50 text-center text-xs font-bold text-green-700 border-t border-green-200";
+            } else {
+                el.className = "p-3 bg-blue-50 text-center text-xs font-bold text-blue-700 border-t border-blue-200";
+            }
+            console.log(msg);
+        }
+
+        function showNotification(msg, type) {
+            var t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            t.style.background = (type === 'success') ? '#10b981' : ((type === 'error') ? '#ef4444' : '#1e293b');
+            setTimeout(function() { t.style.display = 'none'; }, 3000);
+        }
 
         function checkGoogleIdentity() {
-            document.getElementById('dynamicUpdateMsg').innerText = 'Mengesahkan identiti Google...';
-            if (typeof google !== 'undefined' && google.script) {
-                google.script.run
-                    .withSuccessHandler(function(result) {
-                        if (result.success) {
-                            userRole = result.role;
-                            userEmail = result.email;
-                            if (userRole === 'admin') {
-                                showNotification('Akses Pentadbir disahkan (' + userEmail + ').', 'success');
-                            } else {
-                                showNotification('Akses Hanya Baca disahkan (' + userEmail + ').', 'info');
-                            }
-                            fetchDataFromSheet();
-                        } else {
-                            userRole = 'guest';
-                            userEmail = 'Tidak Dikenali';
-                            showNotification(result.message || 'Gagal mengesahkan identiti Google.', 'error');
-                            document.getElementById('dynamicUpdateMsg').innerText = 'SILA LOG MASUK GUNA AKAUN @unisza.edu.my';
-                        }
-                    })
-                    .withFailureHandler(function(err) {
-                        showNotification('Gagal membuat verifikasi Google SSO.', 'error');
-                        document.getElementById('dynamicUpdateMsg').innerText = 'RALAT: Gagal verifikasi Google SSO.';
-                    })
-                    .verifyUserAccess();
-            } else {
-                userRole = 'admin';
-                userEmail = 'pengguna@contoh.com';
-                showNotification('Akses disimulasikan (Local Preview).', 'success');
-                fetchDataFromSheet();
+            updateStatus("Langkah 1: Menyemak identiti pengguna...", "info");
+
+            if (typeof google === 'undefined') {
+                updateStatus("Akses disimulasikan (Sistem Offline).", 'info');
+                return;
             }
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        userRole = result.role;
+                        userEmail = result.email;
+                        updateStatus("Langkah 2: ID Disahkan (" + userEmail + "). Sedang menarik data...", "info");
+                        fetchDataFromSheet();
+                    } else {
+                        updateStatus("RALAT PENGESAHAN: " + result.message, 'error');
+                        showNotification("Gagal membaca identiti", 'error');
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    updateStatus("RALAT PELAYAN (SSO): Gagal berhubung.", 'error');
+                    showNotification('Gagal memverifikasi identiti.', 'error');
+                })
+                .verifyUserAccess();
         }
 
         function requireAdmin(actionFunction) {
             if (userRole === 'admin') {
                 if (actionFunction) actionFunction();
             } else {
-                showNotification('Tindakan ini memerlukan kebenaran Akses Pentadbir.', 'error');
+                alert('Akses Ditolak: Tindakan ini memerlukan kebenaran Akses Pentadbir.');
             }
-        }
-
-        function showNotification(msg, type='info') {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block'; t.style.background = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#1e293b');
-            setTimeout(() => t.style.display = 'none', 3000);
         }
 
         function handleRestrictedAction(type) {
-            if (userRole === 'admin') {
-                if (type === 'pdf') downloadPDF();
-                if (type === 'sheets') window.open(`https://docs.google.com/spreadsheets/d/${currentSpreadsheetId}/edit`, '_blank');
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Akses Ditolak',
-                    text: `Akaun (${userEmail || 'Tidak Diketahui'}) tiada akses Pentadbir. Sila guna akaun @unisza.edu.my.`,
-                    confirmButtonColor: '#2E4DA7'
-                });
-            }
-        }
-
-        function openAdminModal() {
             requireAdmin(function() {
-                document.getElementById('adminModal').classList.remove('hidden');
-                document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 text-xl"></i><p class="text-sm mt-2">Memuat turun senarai admin...</p></div>';
-                google.script.run
-                    .withSuccessHandler(function(list) {
-                        adminList = list;
-                        renderAdminListHtml();
-                    })
-                    .withFailureHandler(function(err) {
-                        document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Gagal memuat senarai: ' + (err.message || err) + '</div>';
-                    })
-                    .getAdminsWeb();
-            });
-        }
-
-        function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
-
-        function renderAdminListHtml() {
-            const area = document.getElementById('adminListArea');
-            if (!adminList.length) {
-                area.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Tiada pentadbir.</div>';
-                return;
-            }
-            let html = '';
-            adminList.forEach(function(email) {
-                html += '<div class="flex items-center justify-between px-6 py-3 border-b border-slate-100 hover:bg-slate-50">' +
-                    '<span class="font-semibold text-slate-700 text-sm">' + escapeHtml(email) + '</span>' +
-                    '<button class="text-red-500 hover:text-red-700 text-xs font-bold" data-email="' + escapeHtml(email) + '"><i class="fas fa-trash mr-1"></i>Buang</button>' +
-                    '</div>';
-            });
-            area.innerHTML = html;
-            area.querySelectorAll('button[data-email]').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    removeAdminAction(this.getAttribute('data-email'));
-                });
-            });
-        }
-
-        function escapeHtml(str) {
-            var div = document.createElement('div');
-            div.appendChild(document.createTextNode(str));
-            return div.innerHTML;
-        }
-
-        function addAdminAction() {
-            var newEmail = document.getElementById('newAdminEmail').value.trim();
-            if (!newEmail) return;
-            document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 text-xl"></i><p class="text-sm mt-2">Menambah admin...</p></div>';
-            google.script.run
-                .withSuccessHandler(function(list) {
-                    adminList = list;
-                    document.getElementById('newAdminEmail').value = '';
-                    renderAdminListHtml();
-                    showNotification('Pentadbir baharu berjaya ditambah.', 'success');
-                })
-                .withFailureHandler(function(err) {
-                    showNotification(err.message || 'Gagal menambah admin.', 'error');
-                    renderAdminListHtml();
-                })
-                .addAdminWeb(newEmail);
-        }
-
-        function removeAdminAction(email) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Buang Pentadbir?',
-                text: 'Adakah anda pasti mahu membuang ' + email + ' dari senarai pentadbir?',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Buang',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b'
-            }).then(function(result) {
-                if (!result.isConfirmed) return;
-                document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-red-500 text-xl"></i><p class="text-sm mt-2">Membuang admin...</p></div>';
-                google.script.run
-                    .withSuccessHandler(function(list) {
-                        adminList = list;
-                        renderAdminListHtml();
-                        showNotification('Pentadbir berjaya dibuang.', 'success');
-                    })
-                    .withFailureHandler(function(err) {
-                        showNotification(err.message || 'Gagal membuang admin.', 'error');
-                        renderAdminListHtml();
-                    })
-                    .removeAdminWeb(email);
-            });
-        }
-
-        function openStudentModal(fak) {
-            const tbody = document.getElementById('studentModalBody');
-            document.getElementById('modalTitle').innerText = fak;
-            tbody.innerHTML = ''; let count = 1;
-
-            globalRawDataCache.forEach((row, i) => {
-                if (i === 0) return;
-                if (String(row[4] || '').trim().toUpperCase() === fak) {
-                    const level = String(row[8] || '').toLowerCase().includes('doktor') ? 'Ph.D' : 'Sarjana';
-                    tbody.innerHTML += `<tr class="border-b bg-white hover:bg-blue-50"><td class="p-2 text-center">${count++}</td><td class="p-2"><b>${row[1]}</b><br><small>${row[2]}</small></td><td class="p-2 text-center">${level}</td><td class="p-2 text-center text-xs">${row[7]}</td></tr>`;
+                if (type === 'pdf') {
+                    alert('Sila gunakan fungsi "Cetak (Ctrl+P / Cmd+P)" pada pelayar web anda dan pilih "Save to PDF" untuk laporan.');
+                }
+                if (type === 'sheets') {
+                    window.open('https://docs.google.com/spreadsheets/d/' + currentSpreadsheetId + '/edit', '_blank');
                 }
             });
-            document.getElementById('studentModal').classList.remove('hidden');
         }
-        function closeStudentModal() { document.getElementById('studentModal').classList.add('hidden'); }
+
+        function fetchDataFromSheet() {
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res && res.success) {
+                        currentSpreadsheetId = res.spreadsheetId;
+                        updateStatus("Langkah 3: Data ditarik berjaya. Memproses jadual...", "info");
+                        processData(res.data);
+                    } else {
+                        updateStatus("RALAT PANGKALAN DATA: " + (res.message || 'Gagal memuat turun.'), 'error');
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    updateStatus("RALAT RANGKAIAN: Gagal menyambung ke pangkalan data Google Sheets.", 'error');
+                })
+                .getPostgraduateData();
+        }
 
         function processData(rawData) {
             globalRawDataCache = rawData;
-            let totalPhd = 0, totalMaster = 0, facMap = {};
-            let qStats = {'Suku 1': {p:0, m:0}, 'Suku 2': {p:0, m:0}, 'Suku 3': {p:0, m:0}, 'Suku 4': {p:0, m:0}};
+            var totalPhd = 0, totalMaster = 0;
+            var facMap = {}, qStats = {'Suku 1':{p:0,m:0},'Suku 2':{p:0,m:0},'Suku 3':{p:0,m:0},'Suku 4':{p:0,m:0}};
 
-            for (let i = 1; i < rawData.length; i++) {
-                const row = rawData[i]; if (!row[1] && !row[4]) continue;
-                const f = String(row[4] || 'TIADA MAKLUMAT').trim().toUpperCase();
-                const isPhd = String(row[8] || '').toLowerCase().includes('doktor');
+            for (var i = 1; i < rawData.length; i++) {
+                var row = rawData[i];
+                if (!row[1] && !row[4]) continue;
+                var f = String(row[4] || 'TIADA MAKLUMAT').trim().toUpperCase();
+                var levelStr = String(row[8] || '').toLowerCase();
+                var isPhd = levelStr.includes('doktor') || levelStr.includes('phd');
 
-                if (!facMap[f]) facMap[f] = {p:0, m:0};
+                if (!facMap[f]) { facMap[f] = {p:0, m:0}; }
                 if (isPhd) { facMap[f].p++; totalPhd++; } else { facMap[f].m++; totalMaster++; }
 
-                const m = extractMonth(row[7]);
-                const q = m <= 1 || m >= 11 ? 'Suku 1' : (m <= 4 ? 'Suku 2' : (m <= 7 ? 'Suku 3' : 'Suku 4'));
-                if (isPhd) qStats[q].p++; else qStats[q].m++;
+                var mStr = String(row[7]).toLowerCase();
+                var m = 0;
+                if (mStr.includes('jan')) m=1; else if (mStr.includes('feb')) m=2; else if (mStr.includes('mac') || mStr.includes('mar')) m=3;
+                else if (mStr.includes('apr')) m=4; else if (mStr.includes('mei') || mStr.includes('may')) m=5; else if (mStr.includes('jun')) m=6;
+                else if (mStr.includes('jul')) m=7; else if (mStr.includes('ogo') || mStr.includes('aug')) m=8; else if (mStr.includes('sep')) m=9;
+                else if (mStr.includes('okt') || mStr.includes('oct')) m=10; else if (mStr.includes('nov')) m=11; else if (mStr.includes('dis') || mStr.includes('dec')) m=12;
+
+                var q = (m <= 1 || m >= 11) ? 'Suku 1' : ((m <= 4) ? 'Suku 2' : ((m <= 7) ? 'Suku 3' : 'Suku 4'));
+                if (isPhd) { qStats[q].p++; } else { qStats[q].m++; }
             }
 
             document.getElementById('valTotalGrads').innerText = totalPhd + totalMaster;
@@ -325,105 +244,148 @@
             document.getElementById('footerTotalMaster').innerText = totalMaster;
             document.getElementById('footerTotalAll').innerText = totalPhd + totalMaster;
 
-            let html = '';
-            Object.keys(facMap).sort((a,b) => (facMap[b].p+facMap[b].m) - (facMap[a].p+facMap[a].m)).forEach(f => {
-                html += `<tr class="faculty-row border-b">
-                    <td class="p-3 text-left font-bold text-blue-800 border-r"><i class="fas fa-search-plus mr-2 opacity-30"></i>${f}</td>
-                    <td class="border-r">${facMap[f].p}</td><td class="border-r">${facMap[f].m}</td>
-                    <td class="font-black">${facMap[f].p + facMap[f].m}</td></tr>`;
-            });
-            document.getElementById('tableBody').innerHTML = html;
-            document.getElementById('dynamicUpdateMsg').innerText = "DATA DIKEMASKINI SECARA AUTOMATIK DARI PANGKALAN DATA";
-            renderCharts(Object.keys(facMap), facMap, qStats);
-        }
+            var html = '';
+            var keys = Object.keys(facMap);
+            keys.sort(function(a, b) { return (facMap[b].p + facMap[b].m) - (facMap[a].p + facMap[a].m); });
 
-        function extractMonth(s) {
-            const m = String(s).toLowerCase();
-            if (m.includes('jan')) return 1; if (m.includes('feb')) return 2; if (m.includes('mac')) return 3; if (m.includes('apr')) return 4;
-            if (m.includes('mei')) return 5; if (m.includes('jun')) return 6; if (m.includes('jul')) return 7; if (m.includes('ogo')) return 8;
-            if (m.includes('sep')) return 9; if (m.includes('okt')) return 10; if (m.includes('nov')) return 11; if (m.includes('dis')) return 12;
-            return 0;
+            for (var j = 0; j < keys.length; j++) {
+                var fak = keys[j];
+                html += '<tr class="faculty-row border-b">' +
+                    '<td class="p-3 text-left font-bold text-blue-800 border-r"><i class="fas fa-search-plus mr-2 opacity-30"></i>' + fak + '</td>' +
+                    '<td class="border-r">' + facMap[fak].p + '</td><td class="border-r">' + facMap[fak].m + '</td>' +
+                    '<td class="font-black">' + (facMap[fak].p + facMap[fak].m) + '</td></tr>';
+            }
+
+            document.getElementById('tableBody').innerHTML = html;
+            updateStatus("DATA BERJAYA DISERAGAMKAN - LOG MASUK SEBAGAI: " + userEmail.toUpperCase() + " (" + userRole.toUpperCase() + ")", 'success');
+            renderCharts(keys, facMap, qStats);
         }
 
         function renderCharts(labels, facMap, qStats) {
-            const fCtx = document.getElementById('facultyChart').getContext('2d');
             if (facultyChartInstance) facultyChartInstance.destroy();
-            facultyChartInstance = new Chart(fCtx, {
+            facultyChartInstance = new Chart(document.getElementById('facultyChart'), {
                 type: 'bar',
-                data: { labels: labels, datasets: [
-                    { label: 'Ph.D', data: labels.map(l => facMap[l].p), backgroundColor: '#10b981' },
-                    { label: 'Sarjana', data: labels.map(l => facMap[l].m), backgroundColor: '#a855f7' }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { datalabels: { color: '#fff', font: { weight: 'bold' }}}}
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Ph.D', data: labels.map(function(l){ return facMap[l].p; }), backgroundColor: '#10b981' },
+                        { label: 'Sarjana', data: labels.map(function(l){ return facMap[l].m; }), backgroundColor: '#a855f7' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
             });
 
-            const qCtx = document.getElementById('quarterlyChart').getContext('2d');
             if (quarterlyChartInstance) quarterlyChartInstance.destroy();
-            quarterlyChartInstance = new Chart(qCtx, {
+            var qKeys = Object.keys(qStats);
+            quarterlyChartInstance = new Chart(document.getElementById('quarterlyChart'), {
                 type: 'line',
-                data: { labels: Object.keys(qStats), datasets: [
-                    { label: 'Ph.D', data: Object.values(qStats).map(s => s.p), borderColor: '#10b981', tension: 0.3, fill: true, backgroundColor: 'rgba(16,185,129,0.1)' },
-                    { label: 'Sarjana', data: Object.values(qStats).map(s => s.m), borderColor: '#a855f7', tension: 0.3, fill: true, backgroundColor: 'rgba(168,85,247,0.1)' }
-                ]},
+                data: {
+                    labels: qKeys,
+                    datasets: [
+                        { label: 'Ph.D', data: qKeys.map(function(k){ return qStats[k].p; }), borderColor: '#10b981', fill: true, backgroundColor: 'rgba(16,185,129,0.1)' },
+                        { label: 'Sarjana', data: qKeys.map(function(k){ return qStats[k].m; }), borderColor: '#a855f7', fill: true, backgroundColor: 'rgba(168,85,247,0.1)' }
+                    ]
+                },
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
 
-        function fetchDataFromSheet() {
-            console.log('fetchDataFromSheet dipanggil.');
-            document.getElementById('syncBanner').classList.remove('hidden');
-            google.script.run
-                .withSuccessHandler(res => {
-                    console.log('SuccessHandler dipanggil.', res);
-                    document.getElementById('syncBanner').classList.add('hidden');
-                    if (res && res.success) {
-                        userEmail = res.email || userEmail;
-                        if (res.isAdmin) userRole = 'admin';
-                        if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
-                        processData(res.data);
-                        showNotification(`Berjaya. Log: ${userEmail}`, 'success');
-                    } else {
-                        const msg = res && res.message ? res.message : '';
-                        showNotification(msg || 'Ralat tidak diketahui', 'error');
-                    }
-                })
-                .withFailureHandler(err => {
-                    console.error('FailureHandler dipanggil.', err);
-                    document.getElementById('syncBanner').classList.add('hidden');
-                    showNotification('Ralat Server Google. Sila pastikan akaun @unisza.edu.my.', 'error');
-                })
-                .getPostgraduateData();
+        function openStudentModal(fak) {
+            var tbody = document.getElementById('studentModalBody');
+            document.getElementById('modalTitle').innerText = fak;
+            tbody.innerHTML = '';
+            var count = 1;
+
+            for (var i = 1; i < globalRawDataCache.length; i++) {
+                var row = globalRawDataCache[i];
+                var rowFak = String(row[4] || '').trim().toUpperCase();
+                if (rowFak === fak) {
+                    var levelStr = String(row[8] || '').toLowerCase();
+                    var level = levelStr.includes('doktor') || levelStr.includes('phd') ? 'Ph.D' : 'Sarjana';
+                    tbody.innerHTML += '<tr class="border-b bg-white hover:bg-blue-50"><td class="p-2 text-center">' + (count++) + '</td><td class="p-2"><b>' + row[1] + '</b><br><small>' + row[2] + '</small></td><td class="p-2 text-center font-semibold text-blue-800">' + level + '</td><td class="p-2 text-center text-xs">' + row[7] + '</td></tr>';
+                }
+            }
+            document.getElementById('studentModal').classList.remove('hidden');
         }
 
-        function downloadPDF() {
-            showNotification('Menjana PDF...', 'info');
-            const actions = document.getElementById('actionButtons'); actions.style.display = 'none';
-            html2pdf().set({ margin: 0.5, filename: 'Laporan_Graduasi.pdf', html2canvas: { scale: 2 }, jsPDF: { format: 'a3', orientation: 'landscape' } })
-                .from(document.querySelector('.max-w-6xl')).save().then(() => actions.style.display = 'flex');
+        function openAdminModal() {
+            requireAdmin(function() {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminListArea').innerHTML = '<div class="text-center py-6 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 mr-2"></i>Membaca pangkalan data...</div>';
+                google.script.run
+                    .withSuccessHandler(function(list) {
+                        adminList = list;
+                        renderAdminListHtml();
+                    })
+                    .withFailureHandler(function(err) {
+                        document.getElementById('adminListArea').innerHTML = '<div class="p-4 text-red-500 text-center text-sm">Gagal memuat: ' + err + '</div>';
+                    })
+                    .getAdminsWeb();
+            });
+        }
+
+        function renderAdminListHtml() {
+            var area = document.getElementById('adminListArea');
+            if (!adminList.length) {
+                area.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">Tiada pentadbir berdaftar.</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < adminList.length; i++) {
+                var email = adminList[i];
+                html += '<div class="flex items-center justify-between px-6 py-3 border-b border-slate-100 hover:bg-slate-50">' +
+                    '<span class="font-semibold text-slate-700 text-sm">' + email + '</span>' +
+                    '<button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="removeAdminAction(\'' + email + '\')"><i class="fas fa-trash mr-1"></i>Buang</button>' +
+                    '</div>';
+            }
+            area.innerHTML = html;
+        }
+
+        function addAdminAction() {
+            var newEmail = document.getElementById('newAdminEmail').value.trim();
+            if (!newEmail) return;
+            google.script.run
+                .withSuccessHandler(function(list) {
+                    adminList = list;
+                    document.getElementById('newAdminEmail').value = '';
+                    renderAdminListHtml();
+                    showNotification('Pentadbir berjaya ditambah.', 'success');
+                })
+                .withFailureHandler(function(err) {
+                    alert('Gagal Tambah: ' + err);
+                })
+                .addAdminWeb(newEmail);
+        }
+
+        function removeAdminAction(email) {
+            if (confirm("Adakah anda pasti mahu membuang " + email + "?")) {
+                google.script.run
+                    .withSuccessHandler(function(list) {
+                        adminList = list;
+                        renderAdminListHtml();
+                        showNotification('Pentadbir berjaya dibuang.', 'success');
+                    })
+                    .withFailureHandler(function(err) {
+                        alert('Gagal Buang: ' + err);
+                    })
+                    .removeAdminWeb(email);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOMContentLoaded dicetuskan.');
-
-            document.getElementById('closeStudentModalBtn').addEventListener('click', closeStudentModal);
-            document.getElementById('syncDataBtn').addEventListener('click', fetchDataFromSheet);
-            document.getElementById('generatePdfBtn').addEventListener('click', () => handleRestrictedAction('pdf'));
-            document.getElementById('openSheetBtn').addEventListener('click', () => handleRestrictedAction('sheets'));
+            document.getElementById('syncDataBtn').addEventListener('click', checkGoogleIdentity);
+            document.getElementById('generatePdfBtn').addEventListener('click', function() { handleRestrictedAction('pdf'); });
+            document.getElementById('openSheetBtn').addEventListener('click', function() { handleRestrictedAction('sheets'); });
             document.getElementById('manageAdminBtn').addEventListener('click', openAdminModal);
 
-            document.getElementById('closeAdminModalBtn').addEventListener('click', closeAdminModal);
-            document.getElementById('closeAdminModalFooterBtn').addEventListener('click', closeAdminModal);
+            document.getElementById('closeStudentModalBtn').addEventListener('click', function() { document.getElementById('studentModal').classList.add('hidden'); });
+            document.getElementById('closeAdminModalBtn').addEventListener('click', function() { document.getElementById('adminModal').classList.add('hidden'); });
+            document.getElementById('closeAdminModalFooterBtn').addEventListener('click', function() { document.getElementById('adminModal').classList.add('hidden'); });
             document.getElementById('addAdminBtn').addEventListener('click', addAdminAction);
 
-            document.getElementById('tableBody').addEventListener('click', function(event) {
-                const targetRow = event.target.closest('.faculty-row');
-                if (targetRow) {
-                    const fakElement = targetRow.querySelector('td');
-                    if (fakElement) {
-                        const fak = fakElement.innerText.replace(/\n/g, ' ').trim();
-                        openStudentModal(fak);
-                    }
-                }
+            document.getElementById('tableBody').addEventListener('click', function(e) {
+                var row = e.target.closest('.faculty-row');
+                if (row) { openStudentModal(row.querySelector('td').innerText.trim()); }
             });
 
             checkGoogleIdentity();
