@@ -127,7 +127,7 @@
     <script>
         console.log('Skrip mula dimuatkan.');
 
-        let userEmail = "", isUserAdmin = false, globalRawDataCache = [];
+        let userEmail = "", isUserAdmin = false, globalRawDataCache = [], currentSpreadsheetId = '';
         let facultyChartInstance = null, quarterlyChartInstance = null;
 
         try { Chart.register(ChartDataLabels); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
@@ -141,7 +141,7 @@
         function handleRestrictedAction(type) {
             if (isUserAdmin) {
                 if (type === 'pdf') downloadPDF();
-                if (type === 'sheets') window.open('https://docs.google.com/spreadsheets/d/1WaWs5VAWN-PHqdAEivqXYU88SFj04HunDGfcV-Uds3U/edit', '_blank');
+                if (type === 'sheets') window.open(`https://docs.google.com/spreadsheets/d/${currentSpreadsheetId}/edit`, '_blank');
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -340,6 +340,7 @@
                     document.getElementById('syncBanner').classList.add('hidden');
                     if (res && res.success) {
                         userEmail = res.email; isUserAdmin = res.isAdmin;
+                        if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
                         processData(res.data);
                         showNotification(`Berjaya. Log: ${userEmail}`, 'success');
                     } else {
