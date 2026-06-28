@@ -127,10 +127,52 @@
     <script>
         console.log('Skrip mula dimuatkan.');
 
-        let userEmail = "", isUserAdmin = false, globalRawDataCache = [], currentSpreadsheetId = '';
-        let facultyChartInstance = null, quarterlyChartInstance = null;
+        let userEmail = "", userRole = 'guest', globalRawDataCache = [], currentSpreadsheetId = '';
+        let facultyChartInstance = null, quarterlyChartInstance = null, adminList = [];
 
         try { Chart.register(ChartDataLabels); } catch(e) { console.warn('ChartDataLabels gagal:', e); }
+
+        function checkGoogleIdentity() {
+            document.getElementById('dynamicUpdateMsg').innerText = 'Mengesahkan identiti Google...';
+            if (typeof google !== 'undefined' && google.script) {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            userRole = result.role;
+                            userEmail = result.email;
+                            if (userRole === 'admin') {
+                                showNotification('Akses Pentadbir disahkan (' + userEmail + ').', 'success');
+                            } else {
+                                showNotification('Akses Hanya Baca disahkan (' + userEmail + ').', 'info');
+                            }
+                            fetchDataFromSheet();
+                        } else {
+                            userRole = 'guest';
+                            userEmail = 'Tidak Dikenali';
+                            showNotification(result.message || 'Gagal mengesahkan identiti Google.', 'error');
+                            document.getElementById('dynamicUpdateMsg').innerText = 'SILA LOG MASUK GUNA AKAUN @unisza.edu.my';
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        showNotification('Gagal membuat verifikasi Google SSO.', 'error');
+                        document.getElementById('dynamicUpdateMsg').innerText = 'RALAT: Gagal verifikasi Google SSO.';
+                    })
+                    .verifyUserAccess();
+            } else {
+                userRole = 'admin';
+                userEmail = 'pengguna@contoh.com';
+                showNotification('Akses disimulasikan (Local Preview).', 'success');
+                fetchDataFromSheet();
+            }
+        }
+
+        function requireAdmin(actionFunction) {
+            if (userRole === 'admin') {
+                if (actionFunction) actionFunction();
+            } else {
+                showNotification('Tindakan ini memerlukan kebenaran Akses Pentadbir.', 'error');
+            }
+        }
 
         function showNotification(msg, type='info') {
             const t = document.getElementById('toast');
@@ -139,7 +181,7 @@
         }
 
         function handleRestrictedAction(type) {
-            if (isUserAdmin) {
+            if (userRole === 'admin') {
                 if (type === 'pdf') downloadPDF();
                 if (type === 'sheets') window.open(`https://docs.google.com/spreadsheets/d/${currentSpreadsheetId}/edit`, '_blank');
             } else {
@@ -152,24 +194,20 @@
             }
         }
 
-        let adminList = [];
-
         function openAdminModal() {
-            if (!isUserAdmin) {
-                Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Hanya pentadbir boleh mengurus senarai admin.', confirmButtonColor: '#2E4DA7' });
-                return;
-            }
-            document.getElementById('adminModal').classList.remove('hidden');
-            document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 text-xl"></i><p class="text-sm mt-2">Memuat turun senarai admin...</p></div>';
-            google.script.run
-                .withSuccessHandler(function(list) {
-                    adminList = list;
-                    renderAdminListHtml();
-                })
-                .withFailureHandler(function(err) {
-                    document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Gagal memuat senarai: ' + (err.message || err) + '</div>';
-                })
-                .getAdminsWeb();
+            requireAdmin(function() {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 text-xl"></i><p class="text-sm mt-2">Memuat turun senarai admin...</p></div>';
+                google.script.run
+                    .withSuccessHandler(function(list) {
+                        adminList = list;
+                        renderAdminListHtml();
+                    })
+                    .withFailureHandler(function(err) {
+                        document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Gagal memuat senarai: ' + (err.message || err) + '</div>';
+                    })
+                    .getAdminsWeb();
+            });
         }
 
         function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
@@ -339,7 +377,8 @@
                     console.log('SuccessHandler dipanggil.', res);
                     document.getElementById('syncBanner').classList.add('hidden');
                     if (res && res.success) {
-                        userEmail = res.email; isUserAdmin = res.isAdmin;
+                        userEmail = res.email || userEmail;
+                        if (res.isAdmin) userRole = 'admin';
                         if (res.spreadsheetId) currentSpreadsheetId = res.spreadsheetId;
                         processData(res.data);
                         showNotification(`Berjaya. Log: ${userEmail}`, 'success');
@@ -387,7 +426,7 @@
                 }
             });
 
-            fetchDataFromSheet();
+            checkGoogleIdentity();
         });
     </script>
 </body>
