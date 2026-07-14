@@ -8,27 +8,33 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
-        .dashboard-wrapper { background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); min-height: 100vh; padding: 24px; }
-        .stat-card { background: white; border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #e2e8f0; }
+        body { font-family: 'Inter', 'Arial', ui-sans-serif, system-ui, sans-serif; background: #ffffff; color: #212121; }
+        .display-text { font-family: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif; }
+        .stat-card { background: #eeece7; border-radius: 8px; padding: 24px; }
+        .chart-card { background: #ffffff; border: 1px solid #d9d9dd; border-radius: 8px; padding: 24px; }
+        .research-table { width: 100%; }
+        .research-table thead th { border-bottom: 1px solid #d9d9dd; }
+        .research-table tbody tr { border-bottom: 1px solid #d9d9dd; }
+        .research-table tbody tr:hover { background: #eeece7; }
         .faculty-row { cursor: pointer; }
-        .faculty-row:hover { background-color: #f1f5f9 !important; }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; z-index: 2000; display: none; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #17171c; color: #ffffff; padding: 12px 24px; border-radius: 32px; z-index: 2000; display: none; font-size: 14px; }
+        .modal-backdrop { background: rgba(23,23,28,0.7); backdrop-filter: blur(4px); }
+        ::selection { background: #4c6ee6; color: #ffffff; }
     </style>
 </head>
 <body>
-    <div id="studentModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[1100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-            <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
-                <h2 id="modalTitle" class="font-bold uppercase tracking-tight">Senarai Pelajar</h2>
-                <button id="closeStudentModalBtn"><i class="fas fa-times text-xl"></i></button>
+    <div id="studentModal" class="fixed inset-0 modal-backdrop z-[1100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-lg" style="border:1px solid #d9d9dd;">
+            <div class="p-4 flex justify-between items-center border-b" style="border-color:#d9d9dd;">
+                <h2 id="modalTitle" class="font-bold text-base display-text" style="letter-spacing:-0.32px;">Senarai Pelajar</h2>
+                <button id="closeStudentModalBtn" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div class="overflow-y-auto p-4 bg-slate-50">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-200">
-                        <tr><th class="p-2 border">No</th><th class="p-2 border text-left">Nama & Matrik</th><th class="p-2 border">Peringkat</th><th class="p-2 border">Tarikh</th></tr>
+            <div class="overflow-y-auto p-4">
+                <table class="research-table text-sm">
+                    <thead>
+                        <tr><th class="p-3 text-left font-medium text-slate-500" style="font-size:12px;">No</th><th class="p-3 text-left font-medium text-slate-500" style="font-size:12px;">Nama & Matrik</th><th class="p-3 text-left font-medium text-slate-500" style="font-size:12px;">Peringkat</th><th class="p-3 text-left font-medium text-slate-500" style="font-size:12px;">Tarikh</th></tr>
                     </thead>
                     <tbody id="studentModalBody"></tbody>
                 </table>
@@ -36,82 +42,88 @@
         </div>
     </div>
 
-    <div id="adminModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[1100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl">
-            <div class="bg-slate-800 p-4 text-white rounded-t-2xl flex justify-between items-center">
-                <h2 class="font-bold uppercase tracking-tight"><i class="fas fa-users-gear mr-2"></i>Urus Pentadbir Sistem</h2>
-                <button id="closeAdminModalBtn"><i class="fas fa-times text-xl"></i></button>
+    <div id="adminModal" class="fixed inset-0 modal-backdrop z-[1100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-lg shadow-lg" style="border:1px solid #d9d9dd;">
+            <div class="p-4 flex justify-between items-center border-b" style="border-color:#d9d9dd;">
+                <h2 class="font-bold text-base display-text" style="letter-spacing:-0.32px;"><i class="fas fa-users-gear mr-2" style="color:#1863dc;"></i>Urus Pentadbir Sistem</h2>
+                <button id="closeAdminModalBtn" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div class="p-6 bg-slate-50 border-b border-slate-200">
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Tambah Emel Pentadbir Baharu</label>
+            <div class="p-6 border-b" style="border-color:#d9d9dd;">
+                <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Tambah Emel Pentadbir Baharu</label>
                 <div class="flex gap-2">
-                    <input type="email" id="newAdminEmail" class="flex-1 border border-slate-300 rounded-lg p-2.5 text-sm outline-none" placeholder="Contoh: admin@unisza.edu.my">
-                    <button id="addAdminBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Tambah</button>
+                    <input type="email" id="newAdminEmail" class="flex-1 border rounded px-3 py-2.5 text-sm outline-none" style="border-color:#d9d9dd;" placeholder="admin@unisza.edu.my">
+                    <button id="addAdminBtn" class="bg-[#17171c] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-black transition-all">Tambah</button>
                 </div>
             </div>
             <div class="max-h-[40vh] overflow-y-auto" id="adminListArea"></div>
-            <div class="p-4 flex justify-end bg-slate-50 rounded-b-2xl border-t">
-                <button id="closeAdminModalFooterBtn" class="px-4 py-2 border rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100">Tutup</button>
+            <div class="p-4 flex justify-end border-t" style="border-color:#d9d9dd;">
+                <button id="closeAdminModalFooterBtn" class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Tutup</button>
             </div>
         </div>
     </div>
 
-    <div class="dashboard-wrapper">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex justify-between items-center mb-8 gap-4 flex-wrap">
+    <div style="min-height:100vh;">
+        <div class="max-w-6xl mx-auto px-6 py-10">
+            <div class="flex justify-between items-center mb-12 gap-4 flex-wrap">
                 <div class="flex items-center gap-4">
-                    <img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" class="h-16">
+                    <img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" class="h-14">
                     <div>
-                        <h1 class="text-3xl font-black text-slate-800 uppercase">Modul Graduasi Siswazah</h1>
-                        <p class="text-slate-500 text-sm mt-1">Status dan Enrolmen Calon Siswazah</p>
+                        <h1 class="text-3xl font-normal display-text text-[#212121] uppercase tracking-tight" style="line-height:1;letter-spacing:-0.48px;">Modul Graduasi Siswazah</h1>
+                        <p class="text-sm mt-2" style="color:#93939f;">Status dan Enrolmen Calon Siswazah</p>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button id="syncDataBtn" class="bg-sky-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-sky-600 shadow-sm transition-all"><i class="fas fa-sync-alt mr-2"></i>Sync</button>
-                    <button id="generatePdfBtn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 shadow-sm transition-all"><i class="fas fa-file-pdf mr-2"></i>Laporan</button>
-                    <button id="openSheetBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 shadow-sm transition-all"><i class="fas fa-table mr-2"></i>Sheet</button>
-                    <button id="manageAdminBtn" class="bg-amber-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-amber-600 shadow-sm transition-all"><i class="fas fa-users-gear mr-2"></i>Urus Admin</button>
+                <div class="flex gap-2 flex-wrap">
+                    <button id="syncDataBtn" class="bg-[#17171c] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-black transition-all"><i class="fas fa-sync-alt mr-2"></i>Sync</button>
+                    <button id="generatePdfBtn" class="px-5 py-2.5 rounded-full text-sm font-medium border transition-all hover:bg-[#eeece7]" style="border-color:#d9d9dd;color:#212121;"><i class="fas fa-file-pdf mr-2"></i>Laporan</button>
+                    <button id="openSheetBtn" class="px-5 py-2.5 rounded-full text-sm font-medium border transition-all hover:bg-[#eeece7]" style="border-color:#d9d9dd;color:#212121;"><i class="fas fa-table mr-2"></i>Sheet</button>
+                    <button id="manageAdminBtn" class="px-5 py-2.5 rounded-full text-sm font-medium transition-all" style="color:#1863dc;border:1px solid #1863dc;"><i class="fas fa-users-gear mr-2"></i>Urus Admin</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
                 <div class="stat-card">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fas fa-user-graduate"></i></div>
-                    <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Keseluruhan</p><h2 id="valTotalGrads" class="text-3xl font-black text-slate-800">-</h2></div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#d9d9dd;"><i class="fas fa-user-graduate text-sm" style="color:#212121;"></i></div>
+                        <div><p class="text-xs font-medium uppercase tracking-wider" style="color:#93939f;">Jumlah Keseluruhan</p><h2 id="valTotalGrads" class="text-3xl font-normal display-text text-[#212121] tracking-tight" style="line-height:1.2;">-</h2></div>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl"><i class="fas fa-award"></i></div>
-                    <div><p class="text-xs font-bold text-slate-500 uppercase">Doktor Falsafah (Ph.D)</p><h2 id="valTotalPhd" class="text-3xl font-black text-slate-800">-</h2></div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#d9d9dd;"><i class="fas fa-award text-sm" style="color:#212121;"></i></div>
+                        <div><p class="text-xs font-medium uppercase tracking-wider" style="color:#93939f;">Doktor Falsafah (Ph.D)</p><h2 id="valTotalPhd" class="text-3xl font-normal display-text text-[#212121] tracking-tight" style="line-height:1.2;">-</h2></div>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl"><i class="fas fa-graduation-cap"></i></div>
-                    <div><p class="text-xs font-bold text-slate-500 uppercase">Sarjana (Master)</p><h2 id="valTotalMaster" class="text-3xl font-black text-slate-800">-</h2></div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#d9d9dd;"><i class="fas fa-graduation-cap text-sm" style="color:#212121;"></i></div>
+                        <div><p class="text-xs font-medium uppercase tracking-wider" style="color:#93939f;">Sarjana (Master)</p><h2 id="valTotalMaster" class="text-3xl font-normal display-text text-[#212121] tracking-tight" style="line-height:1.2;">-</h2></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Graduan Mengikut Fakulti</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-10">
+                <div class="chart-card">
+                    <h3 class="font-medium text-base display-text mb-5 pb-3 border-b" style="border-color:#d9d9dd;letter-spacing:-0.32px;">Graduan Mengikut Fakulti</h3>
                     <div class="h-64"><canvas id="facultyChart"></canvas></div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Laporan Suku Tahun</h3>
+                <div class="chart-card">
+                    <h3 class="font-medium text-base display-text mb-5 pb-3 border-b" style="border-color:#d9d9dd;letter-spacing:-0.32px;">Laporan Suku Tahun</h3>
                     <div class="h-64"><canvas id="quarterlyChart"></canvas></div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <table class="w-full text-sm text-center">
-                    <thead class="bg-slate-800 text-white">
-                        <tr><th rowspan="2" class="p-4 border-r border-slate-700">FAKULTI / INSTITUT</th><th colspan="2" class="p-2 border-b border-slate-700">PERINGKAT PENGAJIAN</th><th rowspan="2" class="p-4">JUMLAH</th></tr>
-                        <tr><th class="p-2 bg-slate-700 border-r border-slate-600">Ph.D</th><th class="p-2 bg-slate-700">Sarjana</th></tr>
+            <div class="bg-white border rounded-lg overflow-hidden" style="border-color:#d9d9dd;">
+                <table class="research-table text-sm text-center">
+                    <thead>
+                        <tr><th rowspan="2" class="p-4 text-left font-medium text-xs uppercase tracking-wider" style="color:#93939f;border-color:#d9d9dd;border-right:1px solid #d9d9dd;">FAKULTI / INSTITUT</th><th colspan="2" class="p-2 font-medium text-xs uppercase tracking-wider" style="color:#93939f;border-color:#d9d9dd;">PERINGKAT PENGAJIAN</th><th rowspan="2" class="p-4 font-medium text-xs uppercase tracking-wider" style="color:#93939f;">JUMLAH</th></tr>
+                        <tr><th class="p-2 font-medium text-xs uppercase tracking-wider" style="color:#93939f;border-color:#d9d9dd;border-right:1px solid #d9d9dd;">Ph.D</th><th class="p-2 font-medium text-xs uppercase tracking-wider" style="color:#93939f;">Sarjana</th></tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
-                    <tfoot class="bg-slate-100 font-black text-slate-800">
-                        <tr><td class="p-4 border-r">JUMLAH KESELURUHAN</td><td id="footerTotalPhd" class="border-r">0</td><td id="footerTotalMaster" class="border-r">0</td><td id="footerTotalAll">0</td></tr>
+                    <tfoot>
+                        <tr style="background:#eeece7;"><td class="p-4 text-left font-bold text-sm border-r" style="border-color:#d9d9dd;">JUMLAH KESELURUHAN</td><td id="footerTotalPhd" class="border-r font-bold" style="border-color:#d9d9dd;">0</td><td id="footerTotalMaster" class="border-r font-bold" style="border-color:#d9d9dd;">0</td><td id="footerTotalAll" class="font-bold">0</td></tr>
                     </tfoot>
                 </table>
-                <div id="dynamicUpdateMsg" class="p-3 bg-yellow-50 text-center text-xs font-bold text-yellow-700 border-t border-yellow-200">Memulakan Sistem...</div>
+                <div id="dynamicUpdateMsg" class="p-3 text-center text-xs font-medium tracking-wider border-t" style="border-color:#d9d9dd;background:#eeece7;color:#75758a;">Memulakan Sistem...</div>
             </div>
         </div>
     </div>
@@ -132,19 +144,23 @@
             var el = document.getElementById('dynamicUpdateMsg');
             el.innerText = msg;
             if (type === 'error') {
-                el.className = "p-3 bg-red-50 text-center text-xs font-bold text-red-600 border-t border-red-200";
+                el.className = "p-3 text-center text-xs font-medium tracking-wider border-t";
+                el.style.cssText = "border-color:#d9d9dd;background:#fef2f2;color:#b30000;";
             } else if (type === 'success') {
-                el.className = "p-3 bg-green-50 text-center text-xs font-bold text-green-700 border-t border-green-200";
+                el.className = "p-3 text-center text-xs font-medium tracking-wider border-t";
+                el.style.cssText = "border-color:#d9d9dd;background:#edfce9;color:#003c33;";
             } else {
-                el.className = "p-3 bg-blue-50 text-center text-xs font-bold text-blue-700 border-t border-blue-200";
+                el.className = "p-3 text-center text-xs font-medium tracking-wider border-t";
+                el.style.cssText = "border-color:#d9d9dd;background:#eeece7;color:#75758a;";
             }
             console.log(msg);
         }
 
         function showNotification(msg, type) {
             var t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block';
-            t.style.background = (type === 'success') ? '#10b981' : ((type === 'error') ? '#ef4444' : '#1e293b');
+            t.innerText = msg;
+            t.style.display = 'block';
+            t.style.background = (type === 'success') ? '#003c33' : ((type === 'error') ? '#b30000' : '#17171c');
             setTimeout(function() { t.style.display = 'none'; }, 3000);
         }
 
@@ -211,20 +227,50 @@
                 .getPostgraduateData();
         }
 
+        var facultyNameMap = {
+            'FP': 'Fakulti Perubatan (FP)',
+            'FSSG': 'Fakulti Sains Sosial Gunaan (FSSG)',
+            'FPP': 'Fakulti Perniagaan & Pengurusan (FPP)',
+            'FRIT': 'Fakulti Reka Bentuk Inovatif & Teknologi (FRIT)',
+            'FF': 'Fakulti Farmasi (FF)',
+            'FIK': 'Fakulti Informatik & Komputeran (FIK)',
+            'FKI': 'Fakulti Pengajian Kontemporari Islam (FKI)',
+            'FUHA': 'Fakulti Undang-undang & Hubungan Antarabangsa (FUHA)',
+            'FSK': 'Fakulti Sains Kesihatan (FSK)',
+            'FBIM': 'Fakulti Biosumber & Industri Makanan (FBIM)',
+            'FBK': 'Fakulti Bahasa & Komunikasi (FBK)',
+            'FUPL': 'Fakulti Pengajian Umum & Pendidikan Lanjutan (FUPL)',
+            'FPV': 'Fakulti Perubatan Veterinar (FPV)',
+            'PUSPA': 'Pusat Asasi Sains & Perubatan UniSZA (PUSPA)',
+            'PPS': 'Pusat Pengajian Siswazah (PPS)',
+            'ESERI': 'Institut Penyelidikan Alam Sekitar Pantai Timur (ESERI)',
+            'INSPIRE': 'Institut Penyelidikan Produk & Tamadun Melayu Islam (INSPIRE)',
+            'AIRIS': 'Pusat Penyelidikan Kecerdasan Buatan Islam & Kelestarian (AIRIS)',
+            'ISF': 'Pusat Penyelidikan Kewangan Sosial Islam (ISF)',
+            'IRC': 'Pusat Penyelidikan Halal (IRC)',
+        };
+
+        function getFacultyFullName(abbr) {
+            return facultyNameMap[abbr] || abbr;
+        }
+
         function processData(rawData) {
             globalRawDataCache = rawData;
             var totalPhd = 0, totalMaster = 0;
-            var facMap = {}, qStats = {'Suku 1':{p:0,m:0},'Suku 2':{p:0,m:0},'Suku 3':{p:0,m:0},'Suku 4':{p:0,m:0}};
+            var facMap = {}, facAbbrMap = {};
+            var monthStats = {};
+            for (var mi = 1; mi <= 12; mi++) { monthStats[mi] = {p:0, m:0}; }
 
             for (var i = 1; i < rawData.length; i++) {
                 var row = rawData[i];
                 if (!row[1] && !row[4]) continue;
                 var f = String(row[4] || 'TIADA MAKLUMAT').trim().toUpperCase();
+                var fullName = getFacultyFullName(f);
                 var levelStr = String(row[8] || '').toLowerCase();
                 var isPhd = levelStr.includes('doktor') || levelStr.includes('phd');
 
-                if (!facMap[f]) { facMap[f] = {p:0, m:0}; }
-                if (isPhd) { facMap[f].p++; totalPhd++; } else { facMap[f].m++; totalMaster++; }
+                if (!facMap[fullName]) { facMap[fullName] = {p:0, m:0}; facAbbrMap[fullName] = f; }
+                if (isPhd) { facMap[fullName].p++; totalPhd++; } else { facMap[fullName].m++; totalMaster++; }
 
                 var mStr = String(row[7]).toLowerCase();
                 var m = 0;
@@ -233,9 +279,12 @@
                 else if (mStr.includes('jul')) m=7; else if (mStr.includes('ogo') || mStr.includes('aug')) m=8; else if (mStr.includes('sep')) m=9;
                 else if (mStr.includes('okt') || mStr.includes('oct')) m=10; else if (mStr.includes('nov')) m=11; else if (mStr.includes('dis') || mStr.includes('dec')) m=12;
 
-                var q = (m <= 1 || m >= 11) ? 'Suku 1' : ((m <= 4) ? 'Suku 2' : ((m <= 7) ? 'Suku 3' : 'Suku 4'));
-                if (isPhd) { qStats[q].p++; } else { qStats[q].m++; }
+                if (m > 0) {
+                    if (isPhd) { monthStats[m].p++; } else { monthStats[m].m++; }
+                }
             }
+
+            window.facAbbrMap = facAbbrMap;
 
             document.getElementById('valTotalGrads').innerText = totalPhd + totalMaster;
             document.getElementById('valTotalPhd').innerText = totalPhd;
@@ -250,43 +299,68 @@
 
             for (var j = 0; j < keys.length; j++) {
                 var fak = keys[j];
-                html += '<tr class="faculty-row border-b">' +
-                    '<td class="p-3 text-left font-bold text-blue-800 border-r"><i class="fas fa-search-plus mr-2 opacity-30"></i>' + fak + '</td>' +
-                    '<td class="border-r">' + facMap[fak].p + '</td><td class="border-r">' + facMap[fak].m + '</td>' +
-                    '<td class="font-black">' + (facMap[fak].p + facMap[fak].m) + '</td></tr>';
+                var abbr = window.facAbbrMap[fak] || fak;
+                html += '<tr class="faculty-row border-b" data-abbr="' + abbr + '">' +
+                    '<td class="p-3 text-left font-semibold text-sm" style="border-color:#d9d9dd;color:#1863dc;border-right:1px solid #d9d9dd;"><i class="fas fa-search-plus mr-2 opacity-30"></i>' + fak + '</td>' +
+                    '<td class="border-r p-3" style="border-color:#d9d9dd;">' + facMap[fak].p + '</td><td class="border-r p-3" style="border-color:#d9d9dd;">' + facMap[fak].m + '</td>' +
+                    '<td class="font-semibold p-3">' + (facMap[fak].p + facMap[fak].m) + '</td></tr>';
             }
 
             document.getElementById('tableBody').innerHTML = html;
             updateStatus("DATA BERJAYA DISERAGAMKAN - LOG MASUK SEBAGAI: " + userEmail.toUpperCase() + " (" + userRole.toUpperCase() + ")", 'success');
-            renderCharts(keys, facMap, qStats);
+            renderCharts(keys, facMap, monthStats);
         }
 
-        function renderCharts(labels, facMap, qStats) {
+        function renderCharts(labels, facMap, monthStats) {
             if (facultyChartInstance) facultyChartInstance.destroy();
+            var facLabels = labels.map(function(l) { return window.facAbbrMap[l] || l; });
             facultyChartInstance = new Chart(document.getElementById('facultyChart'), {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: facLabels,
                     datasets: [
-                        { label: 'Ph.D', data: labels.map(function(l){ return facMap[l].p; }), backgroundColor: '#10b981' },
-                        { label: 'Sarjana', data: labels.map(function(l){ return facMap[l].m; }), backgroundColor: '#a855f7' }
+                        { label: 'Ph.D', data: labels.map(function(l){ return facMap[l].p; }), backgroundColor: '#1863dc' },
+                        { label: 'Sarjana', data: labels.map(function(l){ return facMap[l].m; }), backgroundColor: '#003c33' }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { color: '#f2f2f2' } }, y: { stacked: true, grid: { color: '#f2f2f2' } } } }
             });
 
             if (quarterlyChartInstance) quarterlyChartInstance.destroy();
-            var qKeys = Object.keys(qStats);
+            var monthNames = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+            var monthlyPhd = [], monthlyMaster = [];
+            for (var mi = 1; mi <= 12; mi++) {
+                monthlyPhd.push(monthStats[mi].p);
+                monthlyMaster.push(monthStats[mi].m);
+            }
             quarterlyChartInstance = new Chart(document.getElementById('quarterlyChart'), {
                 type: 'line',
                 data: {
-                    labels: qKeys,
+                    labels: monthNames,
                     datasets: [
-                        { label: 'Ph.D', data: qKeys.map(function(k){ return qStats[k].p; }), borderColor: '#10b981', fill: true, backgroundColor: 'rgba(16,185,129,0.1)' },
-                        { label: 'Sarjana', data: qKeys.map(function(k){ return qStats[k].m; }), borderColor: '#a855f7', fill: true, backgroundColor: 'rgba(168,85,247,0.1)' }
+                        {
+                            label: 'Ph.D',
+                            data: monthlyPhd,
+                            borderColor: '#1863dc',
+                            backgroundColor: 'rgba(24,99,220,0.08)',
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#1863dc'
+                        },
+                        {
+                            label: 'Sarjana',
+                            data: monthlyMaster,
+                            borderColor: '#003c33',
+                            backgroundColor: 'rgba(0,60,51,0.08)',
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#003c33'
+                        }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#f2f2f2' } }, y: { grid: { color: '#f2f2f2' } } } }
             });
         }
 
@@ -302,7 +376,7 @@
                 if (rowFak === fak) {
                     var levelStr = String(row[8] || '').toLowerCase();
                     var level = levelStr.includes('doktor') || levelStr.includes('phd') ? 'Ph.D' : 'Sarjana';
-                    tbody.innerHTML += '<tr class="border-b bg-white hover:bg-blue-50"><td class="p-2 text-center">' + (count++) + '</td><td class="p-2"><b>' + row[1] + '</b><br><small>' + row[2] + '</small></td><td class="p-2 text-center font-semibold text-blue-800">' + level + '</td><td class="p-2 text-center text-xs">' + row[7] + '</td></tr>';
+                    tbody.innerHTML += '<tr class="border-b hover:bg-[#eeece7]" style="border-color:#d9d9dd;"><td class="p-3 text-center text-sm" style="color:#93939f;">' + (count++) + '</td><td class="p-3"><b class="text-sm">' + row[1] + '</b><br><small style="color:#93939f;">' + row[2] + '</small></td><td class="p-3 text-sm font-semibold" style="color:#1863dc;">' + level + '</td><td class="p-3 text-sm" style="color:#93939f;">' + row[7] + '</td></tr>';
                 }
             }
             document.getElementById('studentModal').classList.remove('hidden');
@@ -311,14 +385,14 @@
         function openAdminModal() {
             requireAdmin(function() {
                 document.getElementById('adminModal').classList.remove('hidden');
-                document.getElementById('adminListArea').innerHTML = '<div class="text-center py-6 text-slate-400"><i class="fas fa-spinner fa-spin text-blue-600 mr-2"></i>Membaca pangkalan data...</div>';
+                document.getElementById('adminListArea').innerHTML = '<div class="text-center py-8" style="color:#93939f;"><i class="fas fa-spinner fa-spin mr-2" style="color:#1863dc;"></i>Membaca pangkalan data...</div>';
                 google.script.run
                     .withSuccessHandler(function(list) {
                         adminList = list;
                         renderAdminListHtml();
                     })
                     .withFailureHandler(function(err) {
-                        document.getElementById('adminListArea').innerHTML = '<div class="p-4 text-red-500 text-center text-sm">Gagal memuat: ' + err + '</div>';
+                        document.getElementById('adminListArea').innerHTML = '<div class="p-4 text-center text-sm" style="color:#b30000;">Gagal memuat: ' + err + '</div>';
                     })
                     .getAdminsWeb();
             });
@@ -327,15 +401,15 @@
         function renderAdminListHtml() {
             var area = document.getElementById('adminListArea');
             if (!adminList.length) {
-                area.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">Tiada pentadbir berdaftar.</div>';
+                area.innerHTML = '<div class="p-8 text-center text-sm" style="color:#93939f;">Tiada pentadbir berdaftar.</div>';
                 return;
             }
             var html = '';
             for (var i = 0; i < adminList.length; i++) {
                 var email = adminList[i];
-                html += '<div class="flex items-center justify-between px-6 py-3 border-b border-slate-100 hover:bg-slate-50">' +
-                    '<span class="font-semibold text-slate-700 text-sm">' + email + '</span>' +
-                    '<button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="removeAdminAction(\'' + email + '\')"><i class="fas fa-trash mr-1"></i>Buang</button>' +
+                html += '<div class="flex items-center justify-between px-6 py-3 border-b hover:bg-[#eeece7]" style="border-color:#d9d9dd;">' +
+                    '<span class="text-sm" style="color:#212121;">' + email + '</span>' +
+                    '<button class="text-sm font-medium hover:underline" style="color:#b30000;" onclick="removeAdminAction(\'' + email + '\')"><i class="fas fa-trash mr-1"></i>Buang</button>' +
                     '</div>';
             }
             area.innerHTML = html;
@@ -385,7 +459,7 @@
 
             document.getElementById('tableBody').addEventListener('click', function(e) {
                 var row = e.target.closest('.faculty-row');
-                if (row) { openStudentModal(row.querySelector('td').innerText.trim()); }
+                if (row) { openStudentModal(row.dataset.abbr); }
             });
 
             checkGoogleIdentity();
