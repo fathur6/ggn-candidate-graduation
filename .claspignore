@@ -1,0 +1,5 @@
+graphify-out/**
+.clasp.json
+DESIGN.md
+**/.DS_Store
+**/node_modules/**

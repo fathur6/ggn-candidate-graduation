@@ -1,0 +1,17 @@
+{
+  ".clasp.json": {
+    "mtime": 1782217494.1370416,
+    "ast_hash": "935518cb2e7c8e75cddad323a773f304",
+    "semantic_hash": "935518cb2e7c8e75cddad323a773f304"
+  },
+  "appsscript.json": {
+    "mtime": 1782622077.6759155,
+    "ast_hash": "5ffb2ea5ee7706f66719e26ce8a2cec5",
+    "semantic_hash": "5ffb2ea5ee7706f66719e26ce8a2cec5"
+  },
+  "index.html": {
+    "mtime": 1782622127.0036187,
+    "ast_hash": "e390d0fedcc4599a5ce4072216d23ca6",
+    "semantic_hash": "e390d0fedcc4599a5ce4072216d23ca6"
+  }
+}

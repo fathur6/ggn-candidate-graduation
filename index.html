@@ -107,7 +107,7 @@
                     <div class="h-64"><canvas id="facultyChart"></canvas></div>
                 </div>
                 <div class="chart-card">
-                    <h3 class="font-medium text-base display-text mb-5 pb-3 border-b" style="border-color:#d9d9dd;letter-spacing:-0.32px;">Laporan Suku Tahun</h3>
+                    <h3 class="font-medium text-base display-text mb-1 pb-3 border-b" style="border-color:#d9d9dd;letter-spacing:-0.32px;">Laporan Suku Tahun <span id="chartYearLabel" class="text-xs font-normal" style="color:#93939f;letter-spacing:0;"></span></h3>
                     <div class="h-64"><canvas id="quarterlyChart"></canvas></div>
                 </div>
             </div>
@@ -258,12 +258,43 @@
             globalRawDataCache = rawData;
             var totalPhd = 0, totalMaster = 0;
             var facMap = {}, facAbbrMap = {};
+
+            function parseMonth(str) {
+                var s = String(str).toLowerCase();
+                if (s.includes('jan')) return 1; if (s.includes('feb')) return 2;
+                if (s.includes('mac') || s.includes('mar')) return 3;
+                if (s.includes('apr')) return 4; if (s.includes('mei') || s.includes('may')) return 5;
+                if (s.includes('jun')) return 6; if (s.includes('jul')) return 7;
+                if (s.includes('ogo') || s.includes('aug')) return 8; if (s.includes('sep')) return 9;
+                if (s.includes('okt') || s.includes('oct')) return 10;
+                if (s.includes('nov')) return 11; if (s.includes('dis') || s.includes('dec')) return 12;
+                return 0;
+            }
+
+            function parseYear(str) {
+                var match = String(str).match(/\d{4}/);
+                return match ? parseInt(match[0], 10) : 0;
+            }
+
+            // First pass: find max year
+            var maxYear = 0;
+            for (var i = 1; i < rawData.length; i++) {
+                var row = rawData[i];
+                if (!row[1] && !row[4]) continue;
+                var y = parseYear(row[7]);
+                if (y > maxYear) maxYear = y;
+            }
+
+            // Second pass: aggregate only current year data
             var monthStats = {};
             for (var mi = 1; mi <= 12; mi++) { monthStats[mi] = {p:0, m:0}; }
 
             for (var i = 1; i < rawData.length; i++) {
                 var row = rawData[i];
                 if (!row[1] && !row[4]) continue;
+                var y = parseYear(row[7]);
+                if (y !== maxYear) continue;
+
                 var f = String(row[4] || 'TIADA MAKLUMAT').trim().toUpperCase();
                 var fullName = getFacultyFullName(f);
                 var levelStr = String(row[8] || '').toLowerCase();
@@ -272,13 +303,7 @@
                 if (!facMap[fullName]) { facMap[fullName] = {p:0, m:0}; facAbbrMap[fullName] = f; }
                 if (isPhd) { facMap[fullName].p++; totalPhd++; } else { facMap[fullName].m++; totalMaster++; }
 
-                var mStr = String(row[7]).toLowerCase();
-                var m = 0;
-                if (mStr.includes('jan')) m=1; else if (mStr.includes('feb')) m=2; else if (mStr.includes('mac') || mStr.includes('mar')) m=3;
-                else if (mStr.includes('apr')) m=4; else if (mStr.includes('mei') || mStr.includes('may')) m=5; else if (mStr.includes('jun')) m=6;
-                else if (mStr.includes('jul')) m=7; else if (mStr.includes('ogo') || mStr.includes('aug')) m=8; else if (mStr.includes('sep')) m=9;
-                else if (mStr.includes('okt') || mStr.includes('oct')) m=10; else if (mStr.includes('nov')) m=11; else if (mStr.includes('dis') || mStr.includes('dec')) m=12;
-
+                var m = parseMonth(row[7]);
                 if (m > 0) {
                     if (isPhd) { monthStats[m].p++; } else { monthStats[m].m++; }
                 }
@@ -307,6 +332,7 @@
             }
 
             document.getElementById('tableBody').innerHTML = html;
+            document.getElementById('chartYearLabel').innerText = maxYear > 0 ? '(' + maxYear + ')' : '';
             updateStatus("DATA BERJAYA DISERAGAMKAN - LOG MASUK SEBAGAI: " + userEmail.toUpperCase() + " (" + userRole.toUpperCase() + ")", 'success');
             renderCharts(keys, facMap, monthStats);
         }

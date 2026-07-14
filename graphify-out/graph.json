@@ -1,0 +1,876 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "admin_management_flow",
+        "label": "Admin Management Flow",
+        "nodes": [
+          "code_getadminlist",
+          "code_addadminweb",
+          "code_removeadminweb",
+          "index_addadminaction",
+          "index_removeadminaction",
+          "index_adminmodal"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "Code.gs"
+      },
+      {
+        "id": "data_loading_pipeline",
+        "label": "Data Loading Pipeline",
+        "nodes": [
+          "index_checkgoogleidentity",
+          "code_verifyuseraccess",
+          "index_fetchdatafromsheet",
+          "code_getpostgraduatedata",
+          "index_processdata",
+          "index_rendergraphics"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "index.html"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "appsscript.json",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "appsscript",
+      "community": 0,
+      "norm_label": "appsscript.json"
+    },
+    {
+      "label": "timeZone",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "appsscript_timezone",
+      "community": 0,
+      "norm_label": "timezone"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "appsscript_dependencies",
+      "community": 0,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "webapp",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "appsscript_webapp",
+      "community": 0,
+      "norm_label": "webapp"
+    },
+    {
+      "label": "executeAs",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "appsscript_webapp_executeas",
+      "community": 0,
+      "norm_label": "executeas"
+    },
+    {
+      "label": "access",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "appsscript_webapp_access",
+      "community": 0,
+      "norm_label": "access"
+    },
+    {
+      "label": "exceptionLogging",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "appsscript_exceptionlogging",
+      "community": 0,
+      "norm_label": "exceptionlogging"
+    },
+    {
+      "label": "runtimeVersion",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "appsscript_runtimeversion",
+      "community": 0,
+      "norm_label": "runtimeversion"
+    },
+    {
+      "label": "getSpreadsheetId()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L4",
+      "_origin": "semantic",
+      "id": "code_getspreadsheetid",
+      "community": 4,
+      "norm_label": "getspreadsheetid()"
+    },
+    {
+      "label": "getSheetName()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L8",
+      "_origin": "semantic",
+      "id": "code_getsheetname",
+      "community": 4,
+      "norm_label": "getsheetname()"
+    },
+    {
+      "label": "doGet()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L15",
+      "_origin": "semantic",
+      "id": "code_doGet",
+      "community": 3,
+      "norm_label": "doget()"
+    },
+    {
+      "label": "getAdminList()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L22",
+      "_origin": "semantic",
+      "id": "code_getadminlist",
+      "community": 1,
+      "norm_label": "getadminlist()"
+    },
+    {
+      "label": "verifyUserAccess()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L54",
+      "_origin": "semantic",
+      "id": "code_verifyuseraccess",
+      "community": 2,
+      "norm_label": "verifyuseraccess()"
+    },
+    {
+      "label": "isCurrentUserAdmin()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L74",
+      "_origin": "semantic",
+      "id": "code_iscurrentuseradmin",
+      "community": 1,
+      "norm_label": "iscurrentuseradmin()"
+    },
+    {
+      "label": "getPostgraduateData()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L88",
+      "_origin": "semantic",
+      "id": "code_getpostgraduatedata",
+      "community": 4,
+      "norm_label": "getpostgraduatedata()"
+    },
+    {
+      "label": "getAdminsWeb()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L118",
+      "_origin": "semantic",
+      "id": "code_getadminsweb",
+      "community": 1,
+      "norm_label": "getadminsweb()"
+    },
+    {
+      "label": "addAdminWeb()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L123",
+      "_origin": "semantic",
+      "id": "code_addadminweb",
+      "community": 1,
+      "norm_label": "addadminweb()"
+    },
+    {
+      "label": "removeAdminWeb()",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L133",
+      "_origin": "semantic",
+      "id": "code_removeadminweb",
+      "community": 1,
+      "norm_label": "removeadminweb()"
+    },
+    {
+      "label": "PropertiesService",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L5",
+      "_origin": "semantic",
+      "id": "code_propertiesservice",
+      "community": 4,
+      "norm_label": "propertiesservice"
+    },
+    {
+      "label": "SpreadsheetApp",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L25",
+      "_origin": "semantic",
+      "id": "code_spreadsheetapp",
+      "community": 4,
+      "norm_label": "spreadsheetapp"
+    },
+    {
+      "label": "Session",
+      "file_type": "code",
+      "source_file": "Code.gs",
+      "source_location": "L33",
+      "_origin": "semantic",
+      "id": "code_session",
+      "community": 2,
+      "norm_label": "session"
+    },
+    {
+      "label": "Google Apps Script Runtime",
+      "file_type": "concept",
+      "source_file": "Code.gs",
+      "source_location": null,
+      "_origin": "semantic",
+      "id": "code_googleappsscript",
+      "community": 9,
+      "norm_label": "google apps script runtime"
+    },
+    {
+      "label": "Graduation Dashboard (Modul Graduasi Siswazah)",
+      "file_type": "concept",
+      "source_file": "index.html",
+      "source_location": "L65",
+      "_origin": "semantic",
+      "id": "index_graduationdashboard",
+      "community": 3,
+      "norm_label": "graduation dashboard (modul graduasi siswazah)"
+    },
+    {
+      "label": "updateStatus()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L131",
+      "_origin": "semantic",
+      "id": "index_updatestatus",
+      "community": 6,
+      "norm_label": "updatestatus()"
+    },
+    {
+      "label": "showNotification()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L144",
+      "_origin": "semantic",
+      "id": "index_shownotification",
+      "community": 8,
+      "norm_label": "shownotification()"
+    },
+    {
+      "label": "checkGoogleIdentity()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L151",
+      "_origin": "semantic",
+      "id": "index_checkgoogleidentity",
+      "community": 2,
+      "norm_label": "checkgoogleidentity()"
+    },
+    {
+      "label": "fetchDataFromSheet()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L197",
+      "_origin": "semantic",
+      "id": "index_fetchdatafromsheet",
+      "community": 2,
+      "norm_label": "fetchdatafromsheet()"
+    },
+    {
+      "label": "processData()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L214",
+      "_origin": "semantic",
+      "id": "index_processdata",
+      "community": 2,
+      "norm_label": "processdata()"
+    },
+    {
+      "label": "renderCharts()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L264",
+      "_origin": "semantic",
+      "id": "index_rendergraphics",
+      "community": 2,
+      "norm_label": "rendercharts()"
+    },
+    {
+      "label": "openStudentModal()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L293",
+      "_origin": "semantic",
+      "id": "index_openstudentmodal",
+      "community": 7,
+      "norm_label": "openstudentmodal()"
+    },
+    {
+      "label": "requireAdmin()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L178",
+      "_origin": "semantic",
+      "id": "index_requireadmin",
+      "community": 5,
+      "norm_label": "requireadmin()"
+    },
+    {
+      "label": "handleRestrictedAction()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L186",
+      "_origin": "semantic",
+      "id": "index_handlerestrictedaction",
+      "community": 10,
+      "norm_label": "handlerestrictedaction()"
+    },
+    {
+      "label": "openAdminModal()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L311",
+      "_origin": "semantic",
+      "id": "index_openadminmodal",
+      "community": 5,
+      "norm_label": "openadminmodal()"
+    },
+    {
+      "label": "renderAdminListHtml()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L327",
+      "_origin": "semantic",
+      "id": "index_renderadminlisthtml",
+      "community": 11,
+      "norm_label": "renderadminlisthtml()"
+    },
+    {
+      "label": "addAdminAction()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L344",
+      "_origin": "semantic",
+      "id": "index_addadminaction",
+      "community": 1,
+      "norm_label": "addadminaction()"
+    },
+    {
+      "label": "removeAdminAction()",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L360",
+      "_origin": "semantic",
+      "id": "index_removeadminaction",
+      "community": 1,
+      "norm_label": "removeadminaction()"
+    },
+    {
+      "label": "studentModal UI",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L22",
+      "_origin": "semantic",
+      "id": "index_studentmodal",
+      "community": 7,
+      "norm_label": "studentmodal ui"
+    },
+    {
+      "label": "adminModal UI",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L39",
+      "_origin": "semantic",
+      "id": "index_adminmodal",
+      "community": 5,
+      "norm_label": "adminmodal ui"
+    },
+    {
+      "label": "dynamicUpdateMsg (status bar)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L114",
+      "_origin": "semantic",
+      "id": "index_dynamicupdatemsg",
+      "community": 6,
+      "norm_label": "dynamicupdatemsg (status bar)"
+    },
+    {
+      "label": "toast notification",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L118",
+      "_origin": "semantic",
+      "id": "index_toast",
+      "community": 8,
+      "norm_label": "toast notification"
+    },
+    {
+      "label": "Chart.js",
+      "file_type": "concept",
+      "source_file": "index.html",
+      "source_location": "L8",
+      "_origin": "semantic",
+      "id": "index_chartjs",
+      "community": 3,
+      "norm_label": "chart.js"
+    },
+    {
+      "label": "Tailwind CSS",
+      "file_type": "concept",
+      "source_file": "index.html",
+      "source_location": "L7",
+      "_origin": "semantic",
+      "id": "index_tailwindcss",
+      "community": 3,
+      "norm_label": "tailwind css"
+    },
+    {
+      "label": "Font Awesome",
+      "file_type": "concept",
+      "source_file": "index.html",
+      "source_location": "L10",
+      "_origin": "semantic",
+      "id": "index_fontawesome",
+      "community": 3,
+      "norm_label": "font awesome"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_exceptionlogging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_runtimeversion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_timezone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_webapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "appsscript_webapp",
+      "target": "appsscript_webapp_access",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "appsscript_webapp",
+      "target": "appsscript_webapp_executeas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getadminlist",
+      "target": "code_getspreadsheetid"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getpostgraduatedata",
+      "target": "code_getspreadsheetid"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getspreadsheetid",
+      "target": "code_propertiesservice"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getpostgraduatedata",
+      "target": "code_getsheetname"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_doGet",
+      "target": "index_graduationdashboard"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_addadminweb",
+      "target": "code_getadminlist"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getadminlist",
+      "target": "code_spreadsheetapp"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getadminsweb",
+      "target": "code_getadminlist"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_iscurrentuseradmin",
+      "target": "code_getadminlist"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_removeadminweb",
+      "target": "code_getadminlist"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_verifyuseraccess",
+      "target": "code_getadminlist"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_verifyuseraccess",
+      "target": "code_session"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_checkgoogleidentity",
+      "target": "code_verifyuseraccess"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_addadminweb",
+      "target": "code_iscurrentuseradmin"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getadminsweb",
+      "target": "code_iscurrentuseradmin"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getpostgraduatedata",
+      "target": "code_iscurrentuseradmin"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_removeadminweb",
+      "target": "code_iscurrentuseradmin"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs",
+      "weight": 1.0,
+      "source": "code_getpostgraduatedata",
+      "target": "code_spreadsheetapp"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_fetchdatafromsheet",
+      "target": "code_getpostgraduatedata"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_openadminmodal",
+      "target": "code_getadminsweb"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_addadminaction",
+      "target": "code_addadminweb"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_removeadminaction",
+      "target": "code_removeadminweb"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_graduationdashboard",
+      "target": "index_chartjs"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_graduationdashboard",
+      "target": "index_fontawesome"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_graduationdashboard",
+      "target": "index_tailwindcss"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_updatestatus",
+      "target": "index_dynamicupdatemsg"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_shownotification",
+      "target": "index_toast"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_checkgoogleidentity",
+      "target": "index_fetchdatafromsheet"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_fetchdatafromsheet",
+      "target": "index_processdata"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_processdata",
+      "target": "index_rendergraphics"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_openstudentmodal",
+      "target": "index_studentmodal"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_openadminmodal",
+      "target": "index_requireadmin"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "weight": 1.0,
+      "source": "index_openadminmodal",
+      "target": "index_adminmodal"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "admin_management_flow",
+      "label": "Admin Management Flow",
+      "nodes": [
+        "code_getadminlist",
+        "code_addadminweb",
+        "code_removeadminweb",
+        "index_addadminaction",
+        "index_removeadminaction",
+        "index_adminmodal"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Code.gs"
+    },
+    {
+      "id": "data_loading_pipeline",
+      "label": "Data Loading Pipeline",
+      "nodes": [
+        "index_checkgoogleidentity",
+        "code_verifyuseraccess",
+        "index_fetchdatafromsheet",
+        "code_getpostgraduatedata",
+        "index_processdata",
+        "index_rendergraphics"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html"
+    }
+  ],
+  "built_at_commit": "744ce9f5abcf25dd473a17a6306dcd8039cf1234"
+}
