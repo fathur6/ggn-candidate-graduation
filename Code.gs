@@ -99,12 +99,14 @@ function getPostgraduateData() {
     if (!sheet) throw new Error("Helaian '" + sheetName + "' tidak wujud.");
     
     const rawData = sheet.getDataRange().getDisplayValues();
+    const calcRange = sheet.getRange("L10:N26").getDisplayValues();
     
     return {
       success: true,
       email: userEmail,
       isAdmin: isCurrentUserAdmin(),
       data: rawData,
+      calculated: calcRange,
       spreadsheetId: spreadsheetId
     };
   } catch (error) {

@@ -216,7 +216,7 @@
                     if (res && res.success) {
                         currentSpreadsheetId = res.spreadsheetId;
                         updateStatus("Langkah 3: Data ditarik berjaya. Memproses jadual...", "info");
-                        processData(res.data);
+                        processData(res.data, res.calculated);
                     } else {
                         updateStatus("RALAT PANGKALAN DATA: " + (res.message || 'Gagal memuat turun.'), 'error');
                     }
@@ -254,10 +254,31 @@
             return facultyNameMap[abbr] || abbr;
         }
 
-        function processData(rawData) {
+        function processData(rawData, calcData) {
             globalRawDataCache = rawData;
-            var totalPhd = 0, totalMaster = 0;
             var facMap = {}, facAbbrMap = {};
+            var totalPhd = 0, totalMaster = 0;
+            var sheetTotalPhd = 0, sheetTotalMaster = 0;
+
+            for (var ci = 1; ci < calcData.length; ci++) {
+                var abbr = String(calcData[ci][0] || '').trim().toUpperCase();
+                if (!abbr) continue;
+                if (abbr === 'JUMLAH' || abbr === 'JUMLAH BESAR' || abbr === 'DIRECT SUM' || abbr === 'FAKULTI') {
+                    sheetTotalPhd = parseInt(calcData[ci][1], 10) || 0;
+                    sheetTotalMaster = parseInt(calcData[ci][2], 10) || 0;
+                    continue;
+                }
+                var phd = parseInt(calcData[ci][1], 10) || 0;
+                var master = parseInt(calcData[ci][2], 10) || 0;
+                var fullName = getFacultyFullName(abbr);
+                facMap[fullName] = {p: phd, m: master};
+                facAbbrMap[fullName] = abbr;
+                totalPhd += phd;
+                totalMaster += master;
+            }
+
+            if (sheetTotalPhd > 0) totalPhd = sheetTotalPhd;
+            if (sheetTotalMaster > 0) totalMaster = sheetTotalMaster;
 
             function parseMonth(str) {
                 var s = String(str).toLowerCase();
@@ -276,16 +297,13 @@
                 return match ? parseInt(match[0], 10) : 0;
             }
 
-            // First pass: find max year
             var maxYear = 0;
             for (var i = 1; i < rawData.length; i++) {
-                var row = rawData[i];
-                if (!row[1] && !row[4]) continue;
-                var y = parseYear(row[7]);
+                if (!rawData[i][1] && !rawData[i][4]) continue;
+                var y = parseYear(rawData[i][7]);
                 if (y > maxYear) maxYear = y;
             }
 
-            // Second pass: aggregate only current year data
             var monthStats = {};
             for (var mi = 1; mi <= 12; mi++) { monthStats[mi] = {p:0, m:0}; }
 
@@ -295,14 +313,8 @@
                 var y = parseYear(row[7]);
                 if (y !== maxYear) continue;
 
-                var f = String(row[4] || 'TIADA MAKLUMAT').trim().toUpperCase();
-                var fullName = getFacultyFullName(f);
                 var levelStr = String(row[8] || '').toLowerCase();
                 var isPhd = levelStr.includes('doktor') || levelStr.includes('phd');
-
-                if (!facMap[fullName]) { facMap[fullName] = {p:0, m:0}; facAbbrMap[fullName] = f; }
-                if (isPhd) { facMap[fullName].p++; totalPhd++; } else { facMap[fullName].m++; totalMaster++; }
-
                 var m = parseMonth(row[7]);
                 if (m > 0) {
                     if (isPhd) { monthStats[m].p++; } else { monthStats[m].m++; }
@@ -324,7 +336,7 @@
 
             for (var j = 0; j < keys.length; j++) {
                 var fak = keys[j];
-                var abbr = window.facAbbrMap[fak] || fak;
+                var abbr = facAbbrMap[fak] || fak;
                 html += '<tr class="faculty-row border-b" data-abbr="' + abbr + '">' +
                     '<td class="p-3 text-left font-semibold text-sm" style="border-color:#d9d9dd;color:#1863dc;border-right:1px solid #d9d9dd;"><i class="fas fa-search-plus mr-2 opacity-30"></i>' + fak + '</td>' +
                     '<td class="border-r p-3" style="border-color:#d9d9dd;">' + facMap[fak].p + '</td><td class="border-r p-3" style="border-color:#d9d9dd;">' + facMap[fak].m + '</td>' +
