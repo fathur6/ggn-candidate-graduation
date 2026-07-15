@@ -258,27 +258,31 @@
             globalRawDataCache = rawData;
             var facMap = {}, facAbbrMap = {};
             var totalPhd = 0, totalMaster = 0;
-            var sheetTotalPhd = 0, sheetTotalMaster = 0;
 
+            // baca JUMLAH row dari calcData untuk total rasmi
             for (var ci = 1; ci < calcData.length; ci++) {
                 var abbr = String(calcData[ci][0] || '').trim().toUpperCase();
-                if (!abbr) continue;
-                if (abbr === 'JUMLAH' || abbr === 'JUMLAH BESAR' || abbr === 'DIRECT SUM' || abbr === 'FAKULTI') {
-                    sheetTotalPhd = parseInt(calcData[ci][1], 10) || 0;
-                    sheetTotalMaster = parseInt(calcData[ci][2], 10) || 0;
-                    continue;
+                if (abbr === 'JUMLAH' || abbr === 'JUMLAH BESAR' || abbr === 'DIRECT SUM') {
+                    var sumP = parseInt(calcData[ci][1], 10) || 0;
+                    var sumM = parseInt(calcData[ci][2], 10) || 0;
+                    if (sumP > 0) totalPhd = sumP;
+                    if (sumM > 0) totalMaster = sumM;
+                    break;
                 }
-                var phd = parseInt(calcData[ci][1], 10) || 0;
-                var master = parseInt(calcData[ci][2], 10) || 0;
-                var fullName = getFacultyFullName(abbr);
-                facMap[fullName] = {p: phd, m: master};
-                facAbbrMap[fullName] = abbr;
-                totalPhd += phd;
-                totalMaster += master;
             }
 
-            if (sheetTotalPhd > 0) totalPhd = sheetTotalPhd;
-            if (sheetTotalMaster > 0) totalMaster = sheetTotalMaster;
+            // kira per-fakulti terus dari rawData
+            for (var i = 1; i < rawData.length; i++) {
+                var row = rawData[i];
+                if (!row[1] && !row[4]) continue;
+                var fakAbbr = String(row[4] || '').trim().toUpperCase();
+                if (!fakAbbr) continue;
+                var fullName = getFacultyFullName(fakAbbr);
+                var levelStr = String(row[8] || '').toLowerCase();
+                var isPhd = levelStr.includes('doktor') || levelStr.includes('phd');
+                if (!facMap[fullName]) { facMap[fullName] = {p:0, m:0}; facAbbrMap[fullName] = fakAbbr; }
+                if (isPhd) { facMap[fullName].p++; } else { facMap[fullName].m++; }
+            }
 
             function parseMonth(str) {
                 var s = String(str).toLowerCase();
